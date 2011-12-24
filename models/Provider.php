@@ -8,14 +8,14 @@
 
 namespace li3_oauth\models;
 
-use \li3_oauth\extensions\service\Oauth;
+use \li3_oauth\extensions\service\Oauth1;
 
 class Provider extends \lithium\core\StaticObject {
 
 	/**
 	 * Holds an instance of the oauth service class
 	 *
-	 * @see \li3_oauth\extensions\services\Oauth
+	 * @see \li3_oauth\extensions\services\implementations\Oauth1
 	 */
 	protected static $_service = null;
 
@@ -43,7 +43,7 @@ class Provider extends \lithium\core\StaticObject {
 	 * @return void
 	 */
 	public static function config($config) {
-		static::$_service = new Oauth($config);
+		static::$_service = new Oauth1($config);
 	}
 
 	/**

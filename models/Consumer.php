@@ -18,7 +18,8 @@ class Consumer extends \lithium\core\StaticObject {
 	protected static $_service = null;
 
 	protected static $_classes = array(
-		'oauth' => '\li3_oauth\extensions\service\Oauth'
+		'oauth' => '\li3_oauth\extensions\service\Oauth',
+		'oauth2' => '\li3_oauth\extensions\service\Oauth2'
 	);
 
 	/**
@@ -41,11 +42,16 @@ class Consumer extends \lithium\core\StaticObject {
 	 *              - authorize: path to authorize  url
 	 *              - request_token: path to request token url
 	 *              - access_token: path to access token url
+	 *              - service: service class name oauth/oauth2
 	 *
 	 * @return void
 	 */
 	public static function config($config) {
-		static::$_service = new static::$_classes['oauth']($config);
+		if (isset($config['service'])) {
+			static::$_service = new static::$_classes[$config['service']]($config);
+		} else {
+			static::$_service = new static::$_classes['oauth']($config);
+		}
 	}
 
 	/**
@@ -69,9 +75,7 @@ class Consumer extends \lithium\core\StaticObject {
 	 * @return string
 	 */
 	public static function token($type, array $options = array()) {
-		$defaults = array('method' => 'POST', 'oauth_signature_method' => 'HMAC-SHA1');
-		$options += $defaults;
-		return static::$_service->send($options['method'], $type, array(), $options);
+		return static::$_service->token($type, $options);
 	}
 
 	/**
@@ -125,6 +129,10 @@ class Consumer extends \lithium\core\StaticObject {
 	 */
 	public static function delete($key) {
 		return static::$_service->storage->remove($key);
+	}
+
+	public static function serviceConfig($key) {
+		return static::$_service->config($key);
 	}
 }
 

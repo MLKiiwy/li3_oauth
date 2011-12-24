@@ -10,9 +10,9 @@ class TweetController extends \lithium\action\Controller {
 	protected function _init() {
 		parent::_init();
 		Consumer::config(array(
-			'host' => 'twitter.com',
-			'oauth_consumer_key' => '',
-			'oauth_consumer_secret' => '',
+			'host' => 'api.twitter.com',
+			'oauth_consumer_key' => 'Mn62xF7i5kwT0rVKA3s4Q',
+			'oauth_consumer_secret' => '82jkQ4OCty2tjbohEhmXYiZcjwPz5up72WDXozARo'
 		));
 	}
 
@@ -37,23 +37,53 @@ class TweetController extends \lithium\action\Controller {
 	}
 
 	public function authorize() {
-		$token = Consumer::token('request');
+		Session::delete('oauth.request');
+		Session::delete('oauth.access');
+		$token = Consumer::token('request', array('params' => array(
+			'oauth_callback' => 'http://local.moodpik.com/tweet/success'
+		)));
 		if (is_string($token)) {
 			return $token;
 		}
 		Session::write('oauth.request', $token);
 		$this->redirect(Consumer::authorize($token));
 	}
-
-	public function access() {
-		$token = Session::read('oauth.request');
+	
+	public function success() {
+		$token = $this->request->query;
+		unset($token['url']);
+		$token += Session::read('oauth.request');
 		$access = Consumer::token('access', compact('token'));
 		Session::write('oauth.access', $access);
-		$this->redirect('Tweet::index');
+		$this->redirect('Tweet::feed');
+	}
+	
+
+	public function feed() {
+		$token = Session::read('oauth.access');
+		$items = Consumer::get('/1/statuses/home_timeline.json', array(), compact('token'));
+		echo $items;
+		exit;
+	}
+	
+	public function post() {
+		$token = Session::read('oauth.access');
+		$result = Consumer::post('/1/statuses/update.json',
+			array('status' => 'Testing my status'),
+			compact('token')
+		);
+		echo $result;
+		exit;
 	}
 
+
 	public function login() {
-		$token = Session::read('oauth.request');
+		Session::delete('oauth.request');
+		Session::delete('oauth.access');
+		$token = Consumer::token('request', array('params' => array(
+			'oauth_callback' => 'http://local.moodpik.com/tweet/success'
+		)));
+		Session::write('oauth.request', $token);
 		if (empty($token)) {
 			$this->redirect('Tweet::authorize');
 		}

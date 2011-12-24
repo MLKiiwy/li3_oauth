@@ -8,6 +8,8 @@
 
 namespace li3_oauth\extensions\service;
 
+use li3_oauth\models\Consumer;
+
 /**
  * Oauth service class for handling requests/response to consumers and from providers
  *
@@ -34,7 +36,6 @@ class Oauth extends \lithium\net\http\Service {
 	 *
 	 * @param array $config
 	 *              - host: the oauth domain
-	 *              - oauth_consumer_key: key from oauth service provider
 	 *              - oauth_consumer_secret: secret from oauth service provider
 	 *              - oauth_consumer_key: key from oauth service provider
 	 *              - authorize: path to authorize  url
@@ -85,14 +86,13 @@ class Oauth extends \lithium\net\http\Service {
 	 * @param array $options oauth parameters
 	 *              - headers : send parameters in the header. (default: true)
 	 *              - realm : the realm to authenticate. (default: app directory name)
-	 * @return void
+	 * @return mixed the response from api call
 	 */
 	public function send($method, $path = null, $data = array(), array $options = array()) {
 		$defaults = array('headers' => true, 'realm' => basename(LITHIUM_APP_PATH));
 		$options += $defaults + $this->_config;
 		$url = $this->config($path);
 		$oauth = $this->sign($options + compact('data', 'url', 'method'));
-
 		if ($options['headers']) {
 			$header = 'OAuth realm="' . $options['realm'] . '",';
 			foreach ($oauth as $key => $val) {
@@ -102,6 +102,7 @@ class Oauth extends \lithium\net\http\Service {
 			$options['headers'] = array('Authorization' => $header);
 		}
 		$options['host'] = $options['proxy'] ? $options['proxy'] : $options['host'];
+
 		$response = parent::send($method, $url, $data + $oauth, $options);
 
 		if (strpos($response, 'oauth_token=') !== false) {
@@ -111,13 +112,13 @@ class Oauth extends \lithium\net\http\Service {
 	}
 
 	/**
-	 * A utility method to return a authorize or authenticate url for redirect
+	 * A utility method to return an authorize or authenticate url for redirect
 	 *
 	 * @param string $url
 	 * @param array $options
 	 *              - `token`: (array) adds the oauth_token to the query params
 	 *              - `usePort`: (boolean) use the port in the signature base string
-	 * @return void
+	 * @return stringthe full url 
 	 */
 	public function url($url = null, array $options = array()) {
 		$defaults = array('token' => array('oauth_token' => false), 'usePort' => false);
@@ -130,6 +131,28 @@ class Oauth extends \lithium\net\http\Service {
 		$base = $this->_config['host'];
 		$base .= ($options['usePort']) ? ":{$this->_config['port']}" : null;
 		return "{$this->_config['scheme']}://" . str_replace('//', '/', "{$base}/{$url}");
+	}
+
+	/**
+	 * undocumented function
+	 *
+	 * @param string $method
+	 * @param string $url
+	 * @param array $params
+	 * @param array $options
+	 * @return void
+	 */
+	protected function _base($method, $url, $params, $options) {
+		uksort($params, 'strcmp');
+		$query = array();
+		array_walk($params, function ($value, $key) use (&$query){
+			$query[] = $key . '=' . rawurlencode($value);
+		});
+		unset($options['token']);
+		$path = $this->url($url, $options);
+		return join("&", array(
+			strtoupper($method), rawurlencode($path), rawurlencode(join('&', $query))
+		));
 	}
 
 	/**
@@ -175,28 +198,6 @@ class Oauth extends \lithium\net\http\Service {
 	}
 
 	/**
-	 * undocumented function
-	 *
-	 * @param string $method
-	 * @param string $url
-	 * @param array $params
-	 * @param array $options
-	 * @return void
-	 */
-	protected function _base($method, $url, $params, $options) {
-		uksort($params, 'strcmp');
-		$query = array();
-		array_walk($params, function ($value, $key) use (&$query){
-			$query[] = $key . '=' . rawurlencode($value);
-		});
-		unset($options['token']);
-		$path = $this->url($url, $options);
-		return join("&", array(
-			strtoupper($method), rawurlencode($path), rawurlencode(join('&', $query))
-		));
-	}
-
-	/**
 	 * Handles Oauth specific parameters to ensure they have correct values and order.
 	 *
 	 * @param string $params
@@ -204,11 +205,13 @@ class Oauth extends \lithium\net\http\Service {
 	 */
 	protected function _params($params = array()) {
 		$defaults =  array(
+			'oauth_callback' => '',
 			'oauth_consumer_key' => 'key',
 			'oauth_nonce' => sha1(time() . mt_rand()),
 			'oauth_signature_method' => 'HMAC-SHA1',
 			'oauth_timestamp' => time(),
 			'oauth_token' => '',
+			'oauth_verifier' => '',
 			'oauth_version' => '1.0'
 		);
 		$result = array();
@@ -231,10 +234,22 @@ class Oauth extends \lithium\net\http\Service {
 	}
 
 	/**
+	 * Requests a token of a particular type
+	 *
+	 * @param string $query
+	 * @return array parameters sent from the response body
+	 */
+	public function token($type, array $options = array()) {
+		$defaults = array('method' => 'POST', 'oauth_signature_method' => 'HMAC-SHA1');
+		$options += $defaults;
+		return $this->send($options['method'], $type, array(), $options);
+	}
+
+	/**
 	 * Decodes the response body.
 	 *
 	 * @param string $query
-	 * @return void
+	 * @return array parameters sent from the response body
 	 */
 	protected function _decode($query = null) {
 		parse_str($query, $data);
