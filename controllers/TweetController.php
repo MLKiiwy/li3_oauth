@@ -11,8 +11,8 @@ class TweetController extends \lithium\action\Controller {
 		parent::_init();
 		Consumer::config(array(
 			'host' => 'api.twitter.com',
-			'oauth_consumer_key' => 'Mn62xF7i5kwT0rVKA3s4Q',
-			'oauth_consumer_secret' => '82jkQ4OCty2tjbohEhmXYiZcjwPz5up72WDXozARo'
+			'oauth_consumer_key' => 'your_consumer_key',
+			'oauth_consumer_secret' => 'your_consumer_secret'
 		));
 	}
 
