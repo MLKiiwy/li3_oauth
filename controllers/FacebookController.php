@@ -15,10 +15,10 @@ class FacebookController extends \lithium\action\Controller {
 			'port' => '443',
 			'host' => 'graph.facebook.com',
 			'secondary_host' => 'www.facebook.com',
-			'client_id' => '164931116940829',
+			'client_id' => 'your_client_id',
 			'scope' => 'email,read_stream',
-			'client_secret' => '3f588ddd4a4918bd3a119795a25fcf01',
-			'success' => 'http://local.moodpik.com/facebook/success',
+			'client_secret' => 'your_client_secret',
+			'success' => 'http://localhost/facebook/success',
 		));
 	}
 
