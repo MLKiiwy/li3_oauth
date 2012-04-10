@@ -57,7 +57,9 @@ class TwitterController extends \lithium\action\Controller {
 		$access = Consumer::token('access', compact('token'));
 		Session::write('oauth.access', $access);
 
-		$this->redirect('/');
+        return $this->_filter(__METHOD__, $params, function($self, $params) {
+            $self->redirect('/');
+        });
 	}
 	
 
