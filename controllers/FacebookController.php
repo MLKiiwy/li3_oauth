@@ -27,10 +27,10 @@ class FacebookController extends \lithium\action\Controller {
 		$token = Session::read('oauth.access');
 
 		if (empty($token) && !empty($this->request->query['oauth_token'])) {
-			$this->redirect('Tweet::access');
+			$this->redirect('Facebook::access');
 		}
 		if (empty($token)) {
-			$this->redirect('Tweet::authorize');
+			$this->redirect('Facebook::authorize');
 		}
 		if (!empty($this->request->data)) {
 			$result = Consumer::post('/statuses/update.json',
