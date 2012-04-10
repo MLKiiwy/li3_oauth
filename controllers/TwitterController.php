@@ -2,17 +2,18 @@
 
 namespace li3_oauth\controllers;
 
-use \li3_oauth\models\Consumer;
+use \lithium\core\Environment;
 use \lithium\storage\Session;
 
-class TweetController extends \lithium\action\Controller {
+use \li3_oauth\models\Consumer;
 
+class TwitterController extends \lithium\action\Controller {
 	protected function _init() {
 		parent::_init();
 		Consumer::config(array(
 			'host' => 'api.twitter.com',
-			'oauth_consumer_key' => 'your_consumer_key',
-			'oauth_consumer_secret' => 'your_consumer_secret'
+			'oauth_consumer_key' => Environment::get('oauth.twitter.consumer_key'),
+			'oauth_consumer_secret' => Environment::get('oauth.twitter.consumer_secret')
 		));
 	}
 
@@ -21,10 +22,10 @@ class TweetController extends \lithium\action\Controller {
 		$token = Session::read('oauth.access');
 
 		if (empty($token) && !empty($this->request->query['oauth_token'])) {
-			$this->redirect('Tweet::access');
+			$this->redirect('Twitter::access');
 		}
 		if (empty($token)) {
-			$this->redirect('Tweet::authorize');
+			$this->redirect('Twitter::authorize');
 		}
 		if (!empty($this->request->data)) {
 			$result = Consumer::post('/statuses/update.json',
@@ -40,7 +41,7 @@ class TweetController extends \lithium\action\Controller {
 		Session::delete('oauth.request');
 		Session::delete('oauth.access');
 		$token = Consumer::token('request', array('params' => array(
-			'oauth_callback' => 'http://local.moodpik.com/tweet/success'
+			'oauth_callback' => Environment::get('oauth.twitter.callback.success')
 		)));
 		if (is_string($token)) {
 			return $token;
@@ -55,7 +56,8 @@ class TweetController extends \lithium\action\Controller {
 		$token += Session::read('oauth.request');
 		$access = Consumer::token('access', compact('token'));
 		Session::write('oauth.access', $access);
-		$this->redirect('Tweet::feed');
+
+		$this->redirect('/');
 	}
 	
 
@@ -81,11 +83,11 @@ class TweetController extends \lithium\action\Controller {
 		Session::delete('oauth.request');
 		Session::delete('oauth.access');
 		$token = Consumer::token('request', array('params' => array(
-			'oauth_callback' => 'http://local.moodpik.com/tweet/success'
+			'oauth_callback' => Environment::get('oauth.twitter.callback.success')
 		)));
 		Session::write('oauth.request', $token);
 		if (empty($token)) {
-			$this->redirect('Tweet::authorize');
+			$this->redirect('Twitter::authorize');
 		}
 		$this->redirect(Consumer::authenticate($token));
 	}
