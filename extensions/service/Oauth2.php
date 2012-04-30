@@ -160,7 +160,7 @@ class Oauth2 extends \lithium\net\http\Service {
 		$url = $url ? $this->config($url) : null;
 
 		self::_parseParams($options);
-
+		
 		$params = !empty($options['params'])? '?' . http_build_query($options['params']) : '';
 
 		$base = $host;

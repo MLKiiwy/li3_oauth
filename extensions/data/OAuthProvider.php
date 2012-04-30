@@ -4,7 +4,7 @@ namespace li3_oauth\extensions\data;
 
 use \lithium\core\Environment;
 
-use ConfigException;
+use Exception;
 
 class OAuthProvider extends \lithium\core\Adaptable {
 
@@ -42,9 +42,8 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						'host' => 'graph.facebook.com',
 						'secondary_host' => 'www.facebook.com',
 						'scope' => 'email',
-						'success' => null,
 					);
-					$required = array('credentials', 'success');
+					$required = array('credentials');
 				break;
 
 				case self::SERVICE_NAME_TWITTER:
@@ -60,20 +59,19 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						'host' => 'graph.facebook.com',
 						'secondary_host' => 'www.facebook.com',
 						'scope' => 'email',
-						'success' => null,
 					);
-					$required = array('credentials', 'success');
+					$required = array('credentials');
 				break;
 			}
 			$configurations[$service] += $defaults;
 			foreach ($required as $v) {
 				if (!isset($configurations[$service][$v]) || empty($configurations[$service][$v])) {
-					throw new ConfigException('The parameter : '.$v.' is required in configuration of '.$service);
+					throw new Exception('The parameter : '.$v.' is required in configuration of '.$service);
 				}
 				if ($v == 'credentials') {
 					$env = Environment::get();
 					if (!isset($configurations[$service][$v][$env]) || empty($configurations[$service][$v][$env])) {
-						throw new ConfigException('No credentials set for : '.$service.' in environment '.$env);
+						throw new Exception('No credentials set for : '.$service.' in environment '.$env);
 					}
 				}
 			}

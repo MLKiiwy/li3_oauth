@@ -3,8 +3,13 @@
 namespace li3_oauth\extensions\adapter;
 
 use \lithium\core\Environment;
+use \lithium\storage\Session;
+
+use Exception;
 
 class Consumer extends \lithium\core\Object {
+
+	const SESSION_STATE_KEY = 'li3_oauth.consumer.state';
 
 	/**
 	 * Holds an instance of the oauth service class
@@ -12,6 +17,10 @@ class Consumer extends \lithium\core\Object {
 	 * @see \li3_oauth\extensions\services\Oauth
 	 */
 	protected $_service = null;
+
+	protected $_config;
+
+	protected $_token = null;
 
 	protected static $_classes = array(
 		'oauth' => '\li3_oauth\extensions\service\Oauth',
@@ -23,21 +32,22 @@ class Consumer extends \lithium\core\Object {
 	);
 
 	public function __construct(array $config = array()) {
-		$config += $this->_defaults;
+		$this->_config = $config;
+		$this->_config += $this->_defaults;
 
 		// Getting lithium environnement for settings credentials
 		$env = Environment::get();
-		if(!isset($config['credentials']) || !isset($config['credentials'][$env]) || empty($config['credentials'][$env])) {
-			throw new ConfigException('Credential for : '.$env.' not defined');
+		if(!isset($this->_config['credentials']) || !isset($this->_config['credentials'][$env]) || empty($this->_config['credentials'][$env])) {
+			throw new Exception('Credential for : '.$env.' not defined');
 		}
-		$credentials = $config['credentials'][$env];
-		$config += $credentials;
-		unset($config['credentials']);
+		$credentials = $this->_config['credentials'][$env];
+		$this->_config += $credentials;
+		unset($this->_config['credentials']);
 
-		parent::__construct($config);
+		parent::__construct($this->_config);
 
 		// Create instance of service
-		$this->_service = new static::$_classes[$config['service']]($config);
+		$this->_service = new static::$_classes[$this->_config['service']]($this->_config);
 	}
 
 	/**
@@ -71,8 +81,24 @@ class Consumer extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function authorize(array $token, array $options = array()) {
-		return $this->_service->url('authorize', compact('token') + $options);
+	public function authorize(array $options = array()) {
+		$defaults = array(
+			'client_id' => $this->_config['client_id'],
+			'redirect_uri' => false,
+			'scope' => $this->_config['scope'],
+			'state' => $this->_generateUniqueString(),
+			);
+		$options += $defaults;
+		// Save state value into user session
+		$this->_saveState($options['state']);
+		// Check required
+		$this->_checkRequired($options, array('client_id', 'state', 'redirect_uri'));
+		return $this->_service->url('authorize', array('params' => $options));
+		
+	}
+
+	public function isAuthentificated() {
+		return !empty($this->_token);
 	}
 
 	/**
@@ -82,8 +108,51 @@ class Consumer extends \lithium\core\Object {
 	 * @param array $options
 	 * @return string
 	 */
-	public function authenticate(array $token, array $options = array()) {
-		return $this->_service->url('authenticate', compact('token') + $options);
+	public function authenticate(array $options = array()) {
+
+		$defaults = array(
+			'code' => false,
+			'state' => false,
+			);
+		$options += $defaults;
+
+		// Check required
+		$this->_checkRequired($options, array('code', 'state'));
+
+		// Check state
+		if(!$this->_checkState($options['state'])) {
+			throw new Exception('state doesn\'t macth');
+		}
+
+		// Getting the token
+		$data = $this->token('access', array('code' => $options['code']));
+		var_export($data);
+		die();
+
+		return true;
+		// return $this->_service->url('authenticate', compact('token') + $options);
+	}
+
+	protected function _checkRequired(array $options, array $keys) {
+		foreach ($keys as $value) {
+			if(!isset($options[$value]) || empty($options[$value])) {
+				throw new Exception('Parameter '.$value.' is not set or empty');
+			}
+		}
+	}
+
+	protected function _generateUniqueString() {
+		return md5(time() + rand(0,100));
+	}
+
+	protected function _saveState($state) {
+		// Save into user session
+		Session::write(self::SESSION_STATE_KEY, $state);
+	}
+
+	protected function _checkState($state) {
+		$value = Session::read(self::SESSION_STATE_KEY);
+		return $value == $state;
 	}
 
 	/**
