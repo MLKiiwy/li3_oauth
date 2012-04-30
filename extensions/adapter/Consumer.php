@@ -121,16 +121,29 @@ class Consumer extends \lithium\core\Object {
 
 		// Check state
 		if(!$this->_checkState($options['state'])) {
-			throw new Exception('state doesn\'t macth');
+			throw new Exception('state doesn\'t match');
 		}
 
 		// Getting the token
 		$data = $this->token('access', array('code' => $options['code']));
+		$data = json_decode($data);
+		
+		if(isset($data['error'])) {
+			// Error
+			throw new Exception($data['error']['type']." : ".$data['error']['message']);
+		}
+
 		var_export($data);
-		die();
+
+		// TODO 
+
+		// Erase state data
+		$this->_clearState();
+
+		$token = 'a';
+		$this->setToken($token);
 
 		return true;
-		// return $this->_service->url('authenticate', compact('token') + $options);
 	}
 
 	protected function _checkRequired(array $options, array $keys) {
@@ -155,39 +168,30 @@ class Consumer extends \lithium\core\Object {
 		return $value == $state;
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @return void
-	 */
+	protected function _clearState() {
+		Session::delete(self::SESSION_STATE_KEY);
+	}
+
+	protected function setToken($token) {
+		$this->_token = $token;
+	}
+
+	/*
 	public function store($key, $value) {
 		return $this->_service->storage->write($key, $value);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param string $key
-	 * @return void
-	 */
 	public function fetch($key) {
 		return $this->_service->storage->read($key);
 	}
 
-	/**
-	 * undocumented function
-	 *
-	 * @param string $key
-	 * @return void
-	 */
 	public function delete($key) {
 		return $this->_service->storage->remove($key);
 	}
+	*/
 
-	public function serviceConfig($key) {
-		return $this->_service->config($key);
+	public function config($key) {
+		return isset($this->_config[$key]) ? $this->_config($key) : false;
 	}
 }
 

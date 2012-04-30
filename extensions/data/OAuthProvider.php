@@ -56,9 +56,10 @@ class OAuthProvider extends \lithium\core\Adaptable {
 							'production' => array(),
 						),
 						'port' => '443',
-						'host' => 'graph.facebook.com',
-						'secondary_host' => 'www.facebook.com',
+						'host' => 'api.twitter.com',
 						'scope' => 'email',
+						'authorize' => '/oauth/authorize',
+						'authenticate' => '/oauth/authorize',
 					);
 					$required = array('credentials');
 				break;

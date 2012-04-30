@@ -153,10 +153,11 @@ class Oauth2 extends \lithium\net\http\Service {
 
 		$secondaryHost = array('authorize', 'authenticate', 'logout');
 		$host = $this->_config['host'];
-		if (isset($this->_config['secondary_host']) && in_array($url, $secondaryHost)) {
+
+		if (isset($this->_config['secondary_host']) && !empty($this->_config['secondary_host']) && in_array($url, $secondaryHost)) {
 			$host = $this->_config['secondary_host'];
 		}
-		
+
 		$url = $url ? $this->config($url) : null;
 
 		self::_parseParams($options);
