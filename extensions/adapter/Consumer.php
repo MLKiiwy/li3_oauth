@@ -82,17 +82,37 @@ class Consumer extends \lithium\core\Object {
 	 * @return string
 	 */
 	public function authorize(array $options = array()) {
-		$defaults = array(
-			'client_id' => $this->_config['client_id'],
-			'redirect_uri' => false,
-			'scope' => $this->_config['scope'],
-			'state' => $this->_generateUniqueString(),
-			);
-		$options += $defaults;
-		// Save state value into user session
-		$this->_saveState($options['state']);
-		// Check required
-		$this->_checkRequired($options, array('client_id', 'state', 'redirect_uri'));
+
+		switch($this->_config['type']) {
+			case 'classic':
+
+				// Ask for a request token
+				$token = $this->token('request', array('params' => array('oauth_callback' => $options['redirect_uri'])));
+
+				var_export($token);
+				die();
+
+			break;
+
+			case 'facebook':
+				$defaults = array(
+					'client_id' => $this->_config['client_id'],
+					'redirect_uri' => false,
+					'scope' => $this->_config['scope'],
+					'state' => $this->_generateUniqueString(),
+				);
+
+				$options += $defaults;
+		
+				// Save state value into user session
+				$this->_saveState($options['state']);
+
+				// Check required
+				$this->_checkRequired($options, array('client_id', 'state', 'redirect_uri'));
+			break;
+		}
+
+		
 		return $this->_service->url('authorize', array('params' => $options));
 		
 	}

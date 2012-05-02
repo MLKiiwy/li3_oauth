@@ -85,7 +85,7 @@ class Consumer extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return string
 	 */
-	public static function authorize(array $token, array $options = array()) {
+	public static function authorize($token, array $options = array()) {
 		return static::$_service->url('authorize', compact('token') + $options);
 	}
 
@@ -96,7 +96,7 @@ class Consumer extends \lithium\core\StaticObject {
 	 * @param array $options
 	 * @return string
 	 */
-	public static function authenticate(array $token, array $options = array()) {
+	public static function authenticate($token, array $options = array()) {
 		return static::$_service->url('authenticate', compact('token') + $options);
 	}
 

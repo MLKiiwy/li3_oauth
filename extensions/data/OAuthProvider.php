@@ -42,6 +42,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						'host' => 'graph.facebook.com',
 						'secondary_host' => 'www.facebook.com',
 						'scope' => 'email',
+						'type' => 'facebook',
 					);
 					$required = array('credentials');
 				break;
@@ -60,6 +61,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						'scope' => 'email',
 						'authorize' => '/oauth/authorize',
 						'authenticate' => '/oauth/authorize',
+						'type' => 'classic',
 					);
 					$required = array('credentials');
 				break;
