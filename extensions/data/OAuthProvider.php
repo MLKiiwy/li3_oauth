@@ -48,7 +48,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 
 				case self::SERVICE_NAME_TWITTER:
 					$defaults = array(
-						'adapter' => 'Consumer',
+						'adapter' => 'Twitter',
 						'service' => 'oauth',
 						'credentials' => array(
 							'development' => array(),
@@ -56,11 +56,14 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						),
 						'host' => 'api.twitter.com',
 						'scope' => 'email',
+						'scheme' => 'https',
+						'port' => '443',
 					);
 					$required = array('credentials');
 				break;
 			}
 			$configurations[$service] += $defaults;
+			$configurations[$service]['name'] = $service;	// Setting name
 			foreach ($required as $v) {
 				if (!isset($configurations[$service][$v]) || empty($configurations[$service][$v])) {
 					throw new Exception('The parameter : '.$v.' is required in configuration of '.$service);

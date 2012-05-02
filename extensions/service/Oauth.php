@@ -8,7 +8,6 @@
 
 namespace li3_oauth\extensions\service;
 
-use li3_oauth\models\Consumer;
 
 /**
  * Oauth service class for handling requests/response to consumers and from providers
@@ -183,8 +182,9 @@ class Oauth extends \lithium\net\http\Service {
 
 		$key = join("&", array(
 			rawurlencode($options['oauth_consumer_secret']),
-			rawurlencode($options['token']['oauth_token_secret'])
+			rawurlencode(isset($options['token']['oauth_token_secret']) ? $options['token']['oauth_token_secret'] : "")
 		));
+		
 		switch ($options['oauth_signature_method']) {
 			case 'HMAC-SHA1':
 				$signature = base64_encode(hash_hmac('sha1', $base, $key, true));
