@@ -31,7 +31,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 			switch ($service) {
 				case self::SERVICE_NAME_FACEBOOK:
 					$defaults = array(
-						'adapter' => 'Consumer',
+						'adapter' => 'Facebook',
 						'service' => 'oauth2',
 						'credentials' => array(
 							'development' => array(),

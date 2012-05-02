@@ -10,7 +10,8 @@ class Facebook extends Consumer {
 		if(!$this->isAuthentificated()) {
 			return false;
 		}
-		$data = $this->get('/me');
+		$token = $this->token();
+		$data = $this->get('/me', array(), array('token' => $token));
 		return $data;
 	}
 
