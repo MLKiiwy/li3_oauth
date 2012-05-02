@@ -10,7 +10,7 @@ class Facebook extends Consumer {
 		if(!$this->isAuthentificated()) {
 			return false;
 		}
-		$data = $this->get('1/users/lookup.json', array('user_id' => $this->userId()));
+		$data = $this->get('/me');
 		return $data;
 	}
 
