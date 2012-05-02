@@ -42,7 +42,6 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						'host' => 'graph.facebook.com',
 						'secondary_host' => 'www.facebook.com',
 						'scope' => 'email',
-						'type' => 'facebook',
 					);
 					$required = array('credentials');
 				break;
@@ -50,18 +49,13 @@ class OAuthProvider extends \lithium\core\Adaptable {
 				case self::SERVICE_NAME_TWITTER:
 					$defaults = array(
 						'adapter' => 'Consumer',
-						'service' => 'oauth2',
-						'scheme' => 'https',
+						'service' => 'oauth',
 						'credentials' => array(
 							'development' => array(),
 							'production' => array(),
 						),
-						'port' => '443',
 						'host' => 'api.twitter.com',
 						'scope' => 'email',
-						'authorize' => '/oauth/authorize',
-						'authenticate' => '/oauth/authorize',
-						'type' => 'classic',
 					);
 					$required = array('credentials');
 				break;

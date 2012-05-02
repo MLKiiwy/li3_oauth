@@ -83,8 +83,8 @@ class Consumer extends \lithium\core\Object {
 	 */
 	public function authorize(array $options = array()) {
 
-		switch($this->_config['type']) {
-			case 'classic':
+		switch($this->_config['service']) {
+			case 'oauth':
 
 				// Ask for a request token
 				$token = $this->token('request', array('params' => array('oauth_callback' => $options['redirect_uri'])));
@@ -94,7 +94,7 @@ class Consumer extends \lithium\core\Object {
 
 			break;
 
-			case 'facebook':
+			case 'oauth2':
 				$defaults = array(
 					'client_id' => $this->_config['client_id'],
 					'redirect_uri' => false,
