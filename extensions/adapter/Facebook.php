@@ -6,12 +6,25 @@ use Exception;
 
 class Facebook extends Consumer {
 
+	public function __call($method, $params) {
+		if(in_array($method, array('get', 'post', 'put', 'delete')) && $this->isAuthentificated()) {
+			$token = $this->token();
+			for($i=0; $i<3; $i++) {
+				if(!isset($params[$i])) {
+					$params[$i] = array();
+				}
+			}
+			$params[2] += array('token' => $token);
+		}
+		return $this->_service->invokeMethod($method, $params);
+	}
+
 	public function me() {
 		if(!$this->isAuthentificated()) {
 			return false;
 		}
 		$token = $this->token();
-		$data = $this->get('/me', array(), array('token' => $token));
+		$data = $this->get('/me');
 		return $data;
 	}
 
@@ -19,8 +32,8 @@ class Facebook extends Consumer {
 		if(!$this->isAuthentificated()) {
 			return false;
 		}
-		$token = $this->token();
-		return $token['user_id'];
+		$me = $this->me();
+		return $me['id'];
 	}
 
 	public function friends($userId = null) {
@@ -28,7 +41,7 @@ class Facebook extends Consumer {
 			return false;
 		}
 		$userId = empty($userId) ? $this->userId() : $userId;
-		$data = $this->get('1/friends/ids.json', array('user_id' => $userId));
+		$data = $this->get('friends/ids.json');
 		return $data;
 	}
 

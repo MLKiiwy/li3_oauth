@@ -68,12 +68,14 @@ class OAuthProvider extends \lithium\core\Adaptable {
 				if (!isset($configurations[$service][$v]) || empty($configurations[$service][$v])) {
 					throw new Exception('The parameter : '.$v.' is required in configuration of '.$service);
 				}
+				/*
 				if ($v == 'credentials') {
 					$env = Environment::get();
 					if (!isset($configurations[$service][$v][$env]) || empty($configurations[$service][$v][$env])) {
 						throw new Exception('No credentials set for : '.$service.' in environment '.$env);
 					}
 				}
+				*/
 			}
 		}
 		parent::config($configurations);
