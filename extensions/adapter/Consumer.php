@@ -124,7 +124,7 @@ class Consumer extends \lithium\core\Object {
 				}
 
 				// Save token
-				$this->_sessionWrite(self::SESSION_STATE_KEY, $token);
+				$this->_sessionWrite(self::SESSION_STATE_KEY, $token['oauth_token']);
 
 				// Ok save the token 
 				return $this->_service->url('authenticate', array('token' => $token));
@@ -280,6 +280,20 @@ class Consumer extends \lithium\core\Object {
 	public function clean() {
 		$this->_token = null;
 		$this->_sessionDelete(self::SESSION_TOKEN_KEY);
+	}
+
+	public function basicInfos() {
+		$token = $this->token();
+		$data = array(
+			'uid' => $this->userId(),
+			'access_token' => ($token) ? $token['oauth_token'] : '', 
+			'oauth_secret' => ($token) ? $token['oauth_token_secret'] : '', 
+			'username' => '', 
+			'first_name' => '', 
+			'last_name' => '', 
+			'picture' => '', 
+		);
+		return $data;
 	}
 }
 

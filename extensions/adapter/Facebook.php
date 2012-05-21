@@ -6,6 +6,8 @@ use Exception;
 
 class Facebook extends Consumer {
 
+	const GRAPH_URL = 'https://graph.facebook.com/';
+
 	public function __call($method, $params) {
 		if(in_array($method, array('get', 'post', 'put', 'delete')) && $this->isAuthentificated()) {
 			$token = $this->token();
@@ -45,6 +47,15 @@ class Facebook extends Consumer {
 		return $data;
 	}
 
+	public function basicInfos() {
+		$data = parent::basicInfos();
+		$me = $this->me();
+		$data['username'] = $me->username;
+		$data['first_name'] = $me->first_name; 
+		$data['last_name'] = $me->last_name;
+		$data['picture'] = Facebook::GRAPH_URL . $me->id . '/picture';
+		return $data;
+	}
 }
 
 ?>

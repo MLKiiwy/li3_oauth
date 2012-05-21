@@ -105,7 +105,11 @@ class Oauth extends \lithium\net\http\Service {
 		$response = parent::send($method, $url, $data + $oauth, $options);
 
 		if (strpos($response, 'oauth_token=') !== false) {
-			return $this->_decode($response);
+			$response = $this->_decode($response);
+		}
+
+		if (strpos($path, '.json') !== false) {
+			$response = json_decode($response);
 		}
 		return $response;
 	}
