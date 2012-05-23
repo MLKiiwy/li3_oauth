@@ -7,11 +7,12 @@ use Exception;
 class Twitter extends Consumer {
 
 	public function me() {
-		if(!$this->isAuthentificated()) {
-			return false;
+		$data = parent::me();
+		if($data === false) {
+			return array();
 		}
-		$data = $this->getUser($this->userId());
-		return (!empty($data)) ? $data[$this->userId()] : array();
+		$u = $this->getUser($this->userId());
+		return (count($u) == 1 ) ? $u[$this->userId()] : array();
 	}
 
 	public function userId() {
@@ -32,7 +33,6 @@ class Twitter extends Consumer {
 			return false;
 		}
 		$data = $this->get('1/friends/ids.json', array('user_id' => $options['userId']));
-
 		$friends = array();
 		foreach($data->ids as $uid) {
 			$friends[$uid] = array('uid' => $uid);
@@ -54,11 +54,24 @@ class Twitter extends Consumer {
 			foreach($blocs as $uids) {
 				$users = $this->getUser($uids);
 				foreach($users as $uid => $user) {
-					$friends[$uid] = array('uid' => $uid, 'username' => $user->name,'first_name' => '', 'last_name' => '', 'picture' => $user->profile_image_url);
+					$friends[$uid] = $user;
 				}
 			}
 		}
 		return $friends;
+	}
+
+	protected function _formatUser($user) {
+		$data = array(
+			'uid' => $user->id,
+			'username' => $user->name,
+			'first_name' => null,
+			'last_name' => null,
+			'birthday' => null,
+			'gender' => null,
+			'picture' => $user->profile_image_url
+		);
+		return $data;
 	}
 
 	public function getUser($users) {
@@ -67,7 +80,7 @@ class Twitter extends Consumer {
 		$users = array();
 		if(!empty($data)) {
 			foreach($data as $user) {
-				$users[$user->id] = $user;
+				$users[$user->id] = $this->_formatUser($user);
 			}
 		}
 		return $users;
@@ -76,10 +89,8 @@ class Twitter extends Consumer {
 	public function basicInfos() {
 		$data = parent::basicInfos();
 		$me = $this->me();
-		$data['username'] = $me->name;
-		$data['first_name'] = ''; 
-		$data['last_name'] = '';
-		$data['picture'] = $me->profile_image_url;
+		$data['username'] = $me['username'];
+		$data['picture'] = $me['picture'];
 		return $data;
 	}
 

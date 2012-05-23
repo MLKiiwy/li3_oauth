@@ -282,6 +282,12 @@ class Consumer extends \lithium\core\Object {
 		$this->_sessionDelete(self::SESSION_TOKEN_KEY);
 	}
 
+	public function getRemoveRequest() {
+		return array();
+	}
+
+	// DATA SECTION
+
 	public function basicInfos() {
 		$token = $this->token();
 		$data = array(
@@ -295,6 +301,25 @@ class Consumer extends \lithium\core\Object {
 		);
 		return $data;
 	}
+
+	public function me() {
+		if(!$this->isAuthentificated()) {
+			return false;
+		}
+		$data = array(
+			'uid' => $this->userId(),
+			'username' => null,
+			'first_name' => null,
+			'last_name' => null,
+			'picture' => null
+		);
+		return $data;
+	}
+
+	abstract public function userId();
+	abstract public function friends(array $options = array()) {};
+	abstract public function getUsers($users) {};
+
 }
 
 ?>
