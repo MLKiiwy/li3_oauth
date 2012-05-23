@@ -7,12 +7,12 @@ use Exception;
 class Twitter extends Consumer {
 
 	public function me() {
-		$data = parent::me();
-		if($data === false) {
-			return array();
+		if(!$this->isAuthentificated()) {
+			return false;
 		}
-		$u = $this->getUser($this->userId());
-		return (count($u) == 1 ) ? $u[$this->userId()] : array();
+		$u = $this->getUsers($this->userId());
+		$u = (count($u) == 1 ) ? $u[$this->userId()] : array();
+		return $u;
 	}
 
 	public function userId() {
@@ -52,7 +52,7 @@ class Twitter extends Consumer {
 			}
 			$blocs[] = $uids;
 			foreach($blocs as $uids) {
-				$users = $this->getUser($uids);
+				$users = $this->getUsers($uids);
 				foreach($users as $uid => $user) {
 					$friends[$uid] = $user;
 				}
@@ -74,7 +74,7 @@ class Twitter extends Consumer {
 		return $data;
 	}
 
-	public function getUser($users) {
+	public function getUsers($users) {
 		$users = !(is_array($users)) ? array($users) : $users;
 		$data = $this->get('1/users/lookup.json', array('user_id' => implode(',', $users)));
 		$users = array();
@@ -87,10 +87,17 @@ class Twitter extends Consumer {
 	}
 
 	public function basicInfos() {
-		$data = parent::basicInfos();
 		$me = $this->me();
-		$data['username'] = $me['username'];
-		$data['picture'] = $me['picture'];
+		$token = $this->token();
+		$data = array(
+			'uid' => $me['uid'],
+			'access_token' => ($token) ? $token['oauth_token'] : '', 
+			'oauth_secret' => ($token) ? $token['oauth_token_secret'] : '', 
+			'username' => $me['username'], 
+			'first_name' => null, 
+			'last_name' => null, 
+			'picture' => $me['picture'], 
+		);
 		return $data;
 	}
 

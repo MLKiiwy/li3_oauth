@@ -71,6 +71,15 @@ abstract class Consumer extends \lithium\core\Object {
 			return $this->_token;
 		}
 
+		// Setting expiration date
+		if(!isset($token['date_token_expiration'])) {
+			if(isset($token['expire'])) {
+				$token['date_token_expiration'] = time() + $token['expire'];
+			} else {
+				$token['date_token_expiration'] = null;
+			}
+		}
+
 		$this->_token = $token;
 
 		// Store
@@ -85,7 +94,35 @@ abstract class Consumer extends \lithium\core\Object {
 	 * @return mixed
 	 */
 	public function __call($method, $params) {
-		return $this->_service->invokeMethod($method, $params);
+		switch($this->_config['service']) {
+			case 'oauth':
+				$data =  $this->_service->invokeMethod($method, $params);
+			break;
+
+			case 'oauth2':
+				if(in_array($method, array('get', 'post', 'put', 'delete')) && $this->isAuthentificated()) {
+					$token = $this->token();
+					for($i=0; $i<3; $i++) {
+						if(!isset($params[$i])) {
+							$params[$i] = array();
+						}
+					}
+					$params[2] += array('token' => $token);
+				}
+
+				$data = $this->_service->invokeMethod($method, $params);
+
+				if(is_object($data) && isset($data->error)) {
+					// Token expire
+					if($data->error->code == 190) {
+						// need a new token
+						$this->clean();
+					}
+					throw new Exception($data->error->message);
+				}
+			break;
+		}
+		return $data;
 	}
 
 	/**
@@ -217,12 +254,25 @@ abstract class Consumer extends \lithium\core\Object {
 
 				if(isset($data['error'])) {
 					// Error
-					d($data);
 					throw new Exception($data['error']['type']." : ".$data['error']['message']);
 				}
 
 				// Erase state data
 				$this->_clearState();
+
+				// Getting a long live access token ?
+				if(isset($this->_config['long_life_access']) && $this->_config['long_life_access']) {
+					try {
+						$data = $this->_requestToken('access', array('fb_exchange_token' => $data['access_token'], 'grant_type' => 'fb_exchange_token'));
+					} catch (Exception $e) {
+						throw new Exception('cannot get long live access token');
+					}
+
+					if(isset($data['error'])) {
+						// Error
+						throw new Exception($data['error']['type']." : ".$data['error']['message']);
+					}
+				}
 
 				$this->token($data);
 
@@ -288,34 +338,8 @@ abstract class Consumer extends \lithium\core\Object {
 
 	// DATA SECTION
 
-	public function basicInfos() {
-		$token = $this->token();
-		$data = array(
-			'uid' => $this->userId(),
-			'access_token' => ($token) ? $token['oauth_token'] : '', 
-			'oauth_secret' => ($token) ? $token['oauth_token_secret'] : '', 
-			'username' => '', 
-			'first_name' => '', 
-			'last_name' => '', 
-			'picture' => '', 
-		);
-		return $data;
-	}
-
-	public function me() {
-		if(!$this->isAuthentificated()) {
-			return false;
-		}
-		$data = array(
-			'uid' => $this->userId(),
-			'username' => null,
-			'first_name' => null,
-			'last_name' => null,
-			'picture' => null
-		);
-		return $data;
-	}
-
+	abstract public function basicInfos();
+	abstract public function me();
 	abstract public function userId();
 	abstract public function friends(array $options = array());
 	abstract public function getUsers($users);

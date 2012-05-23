@@ -126,9 +126,11 @@ class Oauth2 extends \lithium\net\http\Service {
 		$response = parent::send($method, $url, $data);
 
 		$hasToken = (strpos($response, 'access_token=') !== false);
-		$isJson = (strpos($response, '"data":') !== false);
+		$isJson = (strpos($response, '{') === 0);
 		if ($hasToken && !$isJson) {
 			return $this->_decode($response);
+		} else if($isJson) {
+			return json_decode($response);
 		}
 		return $response;
 	}

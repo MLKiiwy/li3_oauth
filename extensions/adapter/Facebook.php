@@ -8,35 +8,27 @@ class Facebook extends Consumer {
 
 	const GRAPH_URL = 'https://graph.facebook.com/';
 
-	public function __call($method, $params) {
-		if(in_array($method, array('get', 'post', 'put', 'delete')) && $this->isAuthentificated()) {
-			$token = $this->token();
-			for($i=0; $i<3; $i++) {
-				if(!isset($params[$i])) {
-					$params[$i] = array();
-				}
-			}
-			$params[2] += array('token' => $token);
-		}
-		return $this->_service->invokeMethod($method, $params);
-	}
+	protected $_userId;
 
 	public function me() {
-		$data = parent::me();
-		if($data === false) {
-			return array();
+		if(!$this->isAuthentificated()) {
+			return false;
 		}
 		$me = $this->get('/me');
+		d($me);
+		if(!$me) {
+			return false;
+		}
 		$data['uid'] = $me->id;
-		$data['username'] = $me->username;
+		$data['username'] = $me->name;
 		$data['first_name'] = $me->first_name;
 		$data['last_name'] = $me->last_name;
 		$data['picture'] = Facebook::GRAPH_URL . $me->id . '/picture';
-		if(isset($me['gender']) && !empty($me['gender'])) {
-			$data['gender'] = $me['gender'];
+		if(isset($me->gender) && !empty($me->gender)) {
+			$data['gender'] = $me->gender;
 		}
-		if(isset($me['birthday']) && !empty($me['birthday'])) {
-			$d = explode('/', $me['birthday']);
+		if(isset($me->birthday) && !empty($me->birthday)) {
+			$d = explode('/', $me->birthday);
 			$data['birthday'] = $d[2] . '-' . $d[0] . '-' . $d[1];
 		}
 		return $data;
@@ -46,8 +38,11 @@ class Facebook extends Consumer {
 		if(!$this->isAuthentificated()) {
 			return false;
 		}
-		$me = $this->me();
-		return $me['id'];
+		if(empty($this->_userId)) {
+			$me = $this->me();
+			$this->_userId = $me['uid'];
+		}
+		return $this->_userId;
 	}
 
 	public function friends(array $options = array()) {
@@ -81,7 +76,7 @@ class Facebook extends Consumer {
 		if($data && $data->type == 'user') {
 			$user = array(
 				'uid' => $data->id,
-				'username' => $data->username,
+				'username' => $data->name,
 				'first_name' => $data->first_name,
 				'last_name' => $data->last_name,
 				'gender' => null,
@@ -104,13 +99,12 @@ class Facebook extends Consumer {
 	}
 
 	public function basicInfos() {
-		$data = parent::basicInfos();
 		$me = $this->me();
-		$data['username'] = $me['username'];
-		$data['first_name'] = $me['first_name']; 
-		$data['last_name'] = $me['last_name'];
-		$data['picture'] = $me['picture'];
-		return $data;
+		$token = $this->token();
+		$me['access_token'] = $token['access_token'];
+		$me['oauth_secret'] = '';
+		$me['date_token_expiration'] = $token['date_token_expiration'];
+		return $me;
 	}
 
 	// -> Copy from sdk facebook
