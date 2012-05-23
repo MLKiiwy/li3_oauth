@@ -7,7 +7,7 @@ use \lithium\storage\Session;
 
 use Exception;
 
-class Consumer extends \lithium\core\Object {
+abstract class Consumer extends \lithium\core\Object {
 
 	const SESSION_PREFIX = 'li3_oauth';
 
@@ -317,8 +317,8 @@ class Consumer extends \lithium\core\Object {
 	}
 
 	abstract public function userId();
-	abstract public function friends(array $options = array()) {};
-	abstract public function getUsers($users) {};
+	abstract public function friends(array $options = array());
+	abstract public function getUsers($users);
 
 }
 
