@@ -23,7 +23,7 @@ class Twitter extends Consumer {
 		return $token['user_id'];
 	}
 
-	public function friends($options = array()) {
+	public function friends(array $options = array()) {
 		$defaults = array(
 			'userId' => $this->userId(),
 			'full' => false

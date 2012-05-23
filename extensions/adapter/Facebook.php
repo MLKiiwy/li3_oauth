@@ -50,7 +50,7 @@ class Facebook extends Consumer {
 		return $me['id'];
 	}
 
-	public function friends($options = array()) {
+	public function friends(array $options = array()) {
 		$defaults = array(
 			'userId' => $this->userId(),
 			'full' => false
