@@ -16,7 +16,6 @@ class Facebook extends Consumer {
 			return false;
 		}
 		$me = $this->get('/me');
-		d($me);
 		if(!$me) {
 			return false;
 		}
