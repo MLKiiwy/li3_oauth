@@ -73,8 +73,8 @@ abstract class Consumer extends \lithium\core\Object {
 
 		// Setting expiration date
 		if(!isset($token['date_token_expiration'])) {
-			if(isset($token['expire'])) {
-				$token['date_token_expiration'] = time() + $token['expire'];
+			if(isset($token['expires'])) {
+				$token['date_token_expiration'] = time() + $token['expires'];
 			} else {
 				$token['date_token_expiration'] = null;
 			}
@@ -117,6 +117,13 @@ abstract class Consumer extends \lithium\core\Object {
 					if($data->error->code == 190) {
 						// need a new token
 						$this->clean();
+					}
+
+					switch($data->error->message) {
+						case "Error validating access token: User USER_ID has not authorized application APP_ID.":
+							// TODO
+
+						break;
 					}
 					throw new Exception($data->error->message);
 				}
@@ -257,13 +264,17 @@ abstract class Consumer extends \lithium\core\Object {
 					throw new Exception($data['error']['type']." : ".$data['error']['message']);
 				}
 
+				// d($data);
+				
 				// Erase state data
 				$this->_clearState();
 
 				// Getting a long live access token ?
 				if(isset($this->_config['long_life_access']) && $this->_config['long_life_access']) {
+					// echo "Try long life";
 					try {
-						$data = $this->_requestToken('access', array('fb_exchange_token' => $data['access_token'], 'grant_type' => 'fb_exchange_token'));
+						// $data = $this->_requestToken('access', array('code' => $options['request']->query['code'], 'params' => array('fb_exchange_token' => $data['access_token'], 'grant_type' => 'fb_exchange_token', 'redirect_uri' => $options['callback'])));
+						$data = $this->_requestToken('access', array('params' => array('fb_exchange_token' => $data['access_token'], 'grant_type' => 'fb_exchange_token')));
 					} catch (Exception $e) {
 						throw new Exception('cannot get long live access token');
 					}
@@ -273,6 +284,9 @@ abstract class Consumer extends \lithium\core\Object {
 						throw new Exception($data['error']['type']." : ".$data['error']['message']);
 					}
 				}
+
+				// d($data);
+				// die();
 
 				$this->token($data);
 

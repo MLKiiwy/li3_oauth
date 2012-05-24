@@ -42,6 +42,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						'host' => 'graph.facebook.com',
 						'secondary_host' => 'www.facebook.com',
 						'scope' => 'email',
+						'long_life_access' => false
 					);
 					$required = array('credentials');
 				break;
