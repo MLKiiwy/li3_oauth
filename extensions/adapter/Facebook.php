@@ -7,6 +7,7 @@ use Exception;
 class Facebook extends Consumer {
 
 	const GRAPH_URL = 'https://graph.facebook.com/';
+	const WWW_URL = 'https://www.facebook.com/';
 
 	protected $_userId;
 
@@ -149,6 +150,21 @@ class Facebook extends Consumer {
 		}
 
 		return $data;
+	}
+
+	//
+
+	  public function getLoginStatusUrl($params=array()) {
+		$defaults = array(
+			'api_key' => $this->_config['client_id'],
+			'no_session' => null,
+			'no_user' => null,
+			'ok_session' => null,
+			'session_version' => 3,
+		);
+		$params += $defaults;
+		$this->_checkRequired($params, array('no_session', 'no_user', 'ok_session'));
+		$url = self::WWW_URL . 'extern/login_status.php?' . http_build_query($params, null, '&');
 	}
 }
 
