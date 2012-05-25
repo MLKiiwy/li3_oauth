@@ -24,6 +24,7 @@ class Facebook extends Consumer {
 		$data['first_name'] = $me->first_name;
 		$data['last_name'] = $me->last_name;
 		$data['picture'] = Facebook::GRAPH_URL . $me->id . '/picture';
+		$data['email'] = $me->email;
 		if(isset($me->gender) && !empty($me->gender)) {
 			$data['gender'] = $me->gender;
 		}
@@ -151,9 +152,9 @@ class Facebook extends Consumer {
 		return $data;
 	}
 
-	//
+	// TODO Remove
 
-	  public function getLoginStatusUrl($params=array()) {
+	public function getLoginStatusUrl($params=array()) {
 		$defaults = array(
 			'api_key' => $this->_config['client_id'],
 			'no_session' => null,
