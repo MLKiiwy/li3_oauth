@@ -258,10 +258,9 @@ abstract class Consumer extends \lithium\core\Object {
 					throw new Exception('cannot get access token');
 				}
 				
-
-				if(isset($data['error'])) {
+				if(isset($data->error)) {
 					// Error
-					throw new Exception($data['error']['type']." : ".$data['error']['message']);
+					throw new Exception($data->error->type." : ".$data->error->message);
 				}
 
 				// d($data);
@@ -279,9 +278,9 @@ abstract class Consumer extends \lithium\core\Object {
 						throw new Exception('cannot get long live access token');
 					}
 
-					if(isset($data['error'])) {
+					if(isset($data->error)) {
 						// Error
-						throw new Exception($data['error']['type']." : ".$data['error']['message']);
+						throw new Exception($data->error->type." : ".$data->error->message);
 					}
 				}
 

@@ -8,8 +8,17 @@ class Facebook extends Consumer {
 
 	const GRAPH_URL = 'https://graph.facebook.com/';
 	const WWW_URL = 'https://www.facebook.com/';
+	const PROFILE_BASE = 'http://www.facebook.com';
 
 	protected $_userId;
+
+	public static function getProfileUrl(array $data) {
+		$url = self::PROFILE_BASE;
+		if(isset($data['uid']) && !empty($data['uid'])) {
+			$url.="/profile.php?id=".$data['uid'];
+		}
+		return $url;
+	}
 
 	public function me() {
 		if(!$this->isAuthentificated()) {
@@ -57,7 +66,7 @@ class Facebook extends Consumer {
 		}
 		$data = $this->get($options['userId'] . '/friends');
 		$friends = array();
-		foreach($data as $friend) {
+		foreach($data->data as $friend) {
 			$friends[$friend->id] = array('username' => $friend->name, 'uid' => $friend->id);
 		}
 		if($options['full']) {
@@ -74,7 +83,7 @@ class Facebook extends Consumer {
 	public function _getUser($user) {
 		$data = $this->get($user);
 		$user = array();
-		if($data && $data->type == 'user') {
+		if($data) {
 			$user = array(
 				'uid' => $data->id,
 				'username' => $data->name,
