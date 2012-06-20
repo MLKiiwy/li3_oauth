@@ -131,7 +131,7 @@ class Gmail extends Consumer {
 					$strMail = (string) $email['address'];
 					$name = (empty($name)) ? $strMail : $name;
 					$friend = array(
-						'uid' => $strMail,
+						'uid' => strtolower($strMail),
 						'username' => $name,
 						'first_name' => '',
 						'last_name' => '',

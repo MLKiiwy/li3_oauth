@@ -198,7 +198,7 @@ abstract class Consumer extends \lithium\core\Object {
 
 	public function isAuthentificated() {
 		$token = $this->token();
-		return !empty($token);
+		return !empty($token) && ($token['date_token_expiration'] === null || $token['date_token_expiration'] > time());
 	}
 
 	protected function _arrayRename($data, $rename) {
