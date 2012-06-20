@@ -48,7 +48,8 @@ class Oauth2 extends \lithium\net\http\Service {
 			'scope' => 'email',
 			'host' => 'localhost',
 			'access' => '/oauth/access_token',
-			'secondary_host' => '',
+			'authorize_host' => '',
+			'token_host' => '',
 			'proxy' => false,
 			'port' => 80,
 			'authorize' => '/dialog/oauth',
@@ -61,7 +62,8 @@ class Oauth2 extends \lithium\net\http\Service {
 			'state' => '',
 			'grant_type' => '',
 			'next' => '',
-			'logout' => '/logout.php'
+			'logout' => '/logout.php',
+			'token_access_method' => 'GET'
 		);
 		$config += $defaults;
 
@@ -98,7 +100,14 @@ class Oauth2 extends \lithium\net\http\Service {
 		$options = array_merge_recursive($options, $defaults);
 		$this->_parseParams($options);
 		$url = $this->_config[$type];
-		$result = parent::get($url, $options['params']);
+		if(!empty($this->_config['token_host'])) {
+			$options['host'] = $this->_config['token_host'];
+		}
+		if($this->_config['token_access_method'] == 'POST') {
+			$result = parent::post($url, array(), $options);
+		} else {
+			$result = parent::get($url, array(), $options);
+		}
 		return $result;
 	}
 
@@ -121,16 +130,18 @@ class Oauth2 extends \lithium\net\http\Service {
 		$defaults = array('headers' => true, 'realm' => basename(LITHIUM_APP_PATH));
 		$url = $this->config($path);
 	
-		$options['host'] = $this->_config['proxy'] ?: $this->_config['host'];
+		if(!isset($options['host']) || empty($options['host'])) {
+			$options['host'] = $this->_config['proxy'] ?: $this->_config['host'];
+		}
 
-		$response = parent::send($method, $url, $data);
+		$response = parent::send($method, $url, $data, $options);
 
 		$hasToken = (strpos($response, 'access_token=') !== false);
 		$isJson = (strpos($response, '{') === 0);
 		if ($hasToken && !$isJson) {
 			return $this->_decode($response);
 		} else if($isJson) {
-			return json_decode($response);
+			return json_decode($response, true);
 		}
 		return $response;
 	}
@@ -156,8 +167,8 @@ class Oauth2 extends \lithium\net\http\Service {
 		$secondaryHost = array('authorize', 'authenticate', 'logout');
 		$host = $this->_config['host'];
 
-		if (isset($this->_config['secondary_host']) && !empty($this->_config['secondary_host']) && in_array($url, $secondaryHost)) {
-			$host = $this->_config['secondary_host'];
+		if (isset($this->_config['authorize_host']) && !empty($this->_config['authorize_host']) && in_array($url, $secondaryHost)) {
+			$host = $this->_config['authorize_host'];
 		}
 
 		$url = $url ? $this->config($url) : null;

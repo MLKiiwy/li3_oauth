@@ -10,6 +10,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 
 	const SERVICE_NAME_FACEBOOK = 'facebook';
 	const SERVICE_NAME_TWITTER = 'twitter';
+	const SERVICE_NAME_GMAIL = 'gmail';
 
 	/**
 	 * @var array
@@ -40,9 +41,35 @@ class OAuthProvider extends \lithium\core\Adaptable {
 						'scheme' => 'https',
 						'port' => '443',
 						'host' => 'graph.facebook.com',
-						'secondary_host' => 'www.facebook.com',
+						'authorize_host' => 'www.facebook.com',
 						'scope' => 'email',
 						'long_life_access' => false
+					);
+					$required = array('credentials');
+				break;
+
+				case self::SERVICE_NAME_GMAIL:
+					$defaults = array(
+						'adapter' => 'Gmail',
+						'service' => 'oauth2',
+						'credentials' => array(
+							'development' => array(),
+							'production' => array(),
+						),
+						'scheme' => 'https',
+						'port' => '443',
+						'host' => 'www.googleapis.com/oauth2',
+						'authorize_host' => 'accounts.google.com/o/oauth2',
+						'token_host' => 'accounts.google.com/o/oauth2',
+						'authenticate' => '/auth',
+						'authorize' => '/auth',
+						'access' => '/token',
+						'authenticate' => '/auth',
+						'request' => '/oauth/request_token',
+						'logout' => '/oauth/request_token',
+						'scope' => '',
+						'long_life_access' => false,
+						'token_access_method' => 'POST'
 					);
 					$required = array('credentials');
 				break;

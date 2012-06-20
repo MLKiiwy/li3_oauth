@@ -25,20 +25,20 @@ class Facebook extends Consumer {
 			return false;
 		}
 		$me = $this->get('/me');
-		if(!$me) {
+		if(empty($me)) {
 			return false;
 		}
-		$data['uid'] = $me->id;
-		$data['username'] = $me->name;
-		$data['first_name'] = $me->first_name;
-		$data['last_name'] = $me->last_name;
-		$data['picture'] = Facebook::GRAPH_URL . $me->id . '/picture';
-		$data['email'] = $me->email;
-		if(isset($me->gender) && !empty($me->gender)) {
-			$data['gender'] = $me->gender;
+		$data['uid'] = $me['id'];
+		$data['username'] = $me['name'];
+		$data['first_name'] = $me['first_name'];
+		$data['last_name'] = $me['last_name'];
+		$data['picture'] = Facebook::GRAPH_URL . $me['id'] . '/picture';
+		$data['email'] = $me['email'];
+		if(isset($me['gender']) && !empty($me['gender'])) {
+			$data['gender'] = $me['gender'];
 		}
-		if(isset($me->birthday) && !empty($me->birthday)) {
-			$d = explode('/', $me->birthday);
+		if(isset($me['birthday']) && !empty($me['birthday'])) {
+			$d = explode('/', $me['birthday']);
 			$data['birthday'] = $d[2] . '-' . $d[0] . '-' . $d[1];
 		}
 		return $data;
@@ -66,8 +66,8 @@ class Facebook extends Consumer {
 		}
 		$data = $this->get($options['userId'] . '/friends');
 		$friends = array();
-		foreach($data->data as $friend) {
-			$friends[$friend->id] = array('username' => $friend->name, 'uid' => $friend->id);
+		foreach($data['data'] as $friend) {
+			$friends[$friend['id']] = array('username' => $friend['name'], 'uid' => $friend['id']);
 		}
 		if($options['full']) {
 			foreach($friends as $k => $v) {
@@ -85,15 +85,15 @@ class Facebook extends Consumer {
 		$user = array();
 		if($data) {
 			$user = array(
-				'uid' => $data->id,
-				'username' => $data->name,
-				'first_name' => $data->first_name,
-				'last_name' => $data->last_name,
+				'uid' => $data['id'],
+				'username' => $data['name'],
+				'first_name' => $data['first_name'],
+				'last_name' => $data['last_name'],
 				'gender' => null,
-				'picture' => Facebook::GRAPH_URL . $data->id . '/picture',
+				'picture' => Facebook::GRAPH_URL . $data['id'] . '/picture',
 			);
-			if(isset($data->gender) && !empty($data->gender)) {
-				$user['gender'] = $data->gender;
+			if(isset($data['gender']) && !empty($data['gender'])) {
+				$user['gender'] = $data['gender'];
 			}
 		}
 		return $user;

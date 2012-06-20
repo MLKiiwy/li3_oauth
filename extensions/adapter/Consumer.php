@@ -73,8 +73,9 @@ abstract class Consumer extends \lithium\core\Object {
 
 		// Setting expiration date
 		if(!isset($token['date_token_expiration'])) {
-			if(isset($token['expires'])) {
-				$token['date_token_expiration'] = time() + $token['expires'];
+			if(isset($token['expires']) || isset($token['expires_in'])) {
+				$expire = (isset($token['expires'])) ? $token['expires'] : $token['expires_in'];
+				$token['date_token_expiration'] = time() + $expire;
 			} else {
 				$token['date_token_expiration'] = null;
 			}
@@ -258,13 +259,12 @@ abstract class Consumer extends \lithium\core\Object {
 					throw new Exception('cannot get access token');
 				}
 				
-				if(isset($data->error)) {
+				if(isset($data['error'])) {
 					// Error
-					throw new Exception($data->error->type." : ".$data->error->message);
+					$message = (is_string($data['error'])) ? $data['error'] : $data['error']['type']." : ".$data['error']['message'];
+					throw new Exception($message);
 				}
 
-				// d($data);
-				
 				// Erase state data
 				$this->_clearState();
 
@@ -278,14 +278,12 @@ abstract class Consumer extends \lithium\core\Object {
 						throw new Exception('cannot get long live access token');
 					}
 
-					if(isset($data->error)) {
+					if(isset($data['error'])) {
 						// Error
-						throw new Exception($data->error->type." : ".$data->error->message);
+						$message = (is_string($data['error'])) ? $data['error'] : $data['error']['type']." : ".$data['error']['message'];
+						throw new Exception($message);
 					}
 				}
-
-				// d($data);
-				// die();
 
 				$this->token($data);
 
