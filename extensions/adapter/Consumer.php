@@ -338,6 +338,10 @@ abstract class Consumer extends \lithium\core\Object {
 		return isset($this->_config[$key]) ? $this->_config($key) : false;
 	}
 
+	public function getConfig($key = null) {
+		return isset($this->_config[$key]) ? $this->_config[$key] : $this->_config;
+	}
+
 	public function clean() {
 		$this->_token = null;
 		$this->_sessionDelete(self::SESSION_TOKEN_KEY);
