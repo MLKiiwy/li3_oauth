@@ -353,6 +353,7 @@ abstract class Consumer extends \lithium\core\Object {
 
 	// DATA SECTION
 
+	abstract function checkTokenValidity($uid = null);
 	abstract public function basicInfos();
 	abstract public function me();
 	abstract public function userId();

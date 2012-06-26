@@ -149,6 +149,15 @@ class Gmail extends Consumer {
 		// TODO
 		return array();
 	}
+
+	
+	public function checkTokenValidity($uid = null) {
+		if(!$this->isAuthentificated()) {
+			return false;
+		}
+		// TODO
+		return true;
+	}
 }
 
 ?>

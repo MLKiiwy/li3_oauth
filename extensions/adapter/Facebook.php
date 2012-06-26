@@ -121,6 +121,38 @@ class Facebook extends Consumer {
 		return $this->post('/me/' . $action, $params);
 	}
 
+	public function checkTokenValidity($uid = null) {
+		if(!$this->isAuthentificated()) {
+			return false;
+		}
+		$me = $this->get('/me');
+		if(empty($me)) {
+			// Destroy session 
+			$this->clean();
+			return false;
+		}
+		if(!empty($uid) && $uid !== $me['id']) {
+			$this->clean();
+			return false;
+		}
+		return true;
+	}
+
+	public function getLongLiveToken() {
+		if(!$this->isAuthentificated()) {
+			return false;
+		}
+		$token = $this->token();
+		try {
+			$data = $this->_requestToken('access', array('params' => array('fb_exchange_token' => $token['access_token'], 'grant_type' => 'fb_exchange_token')));
+			$this->token($data);
+			return true;
+		} catch (Exception $e) {
+			throw new Exception('cannot get long live access token');
+		}
+		return false;
+	}
+
 	// -> Copy from sdk facebook
 	// TODO : Check if lithium can do it itself ?
 

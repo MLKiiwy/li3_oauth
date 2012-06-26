@@ -101,6 +101,14 @@ class Twitter extends Consumer {
 		return $data;
 	}
 
+	public function checkTokenValidity($uid = null) {
+		if(!$this->isAuthentificated()) {
+			return false;
+		}
+		// TODO
+		return true;
+	}
+
 }
 
 ?>
