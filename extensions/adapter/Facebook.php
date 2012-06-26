@@ -117,6 +117,10 @@ class Facebook extends Consumer {
 		return $me;
 	}
 
+	public function addOpenGraph($action, $params) {
+		return $this->post('/me/' . $action, $params);
+	}
+
 	// -> Copy from sdk facebook
 	// TODO : Check if lithium can do it itself ?
 
