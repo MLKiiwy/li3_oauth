@@ -6,6 +6,16 @@ use Exception;
 
 class Twitter extends Consumer {
 
+	const PROFILE_BASE = 'https://twitter.com/#!/';
+
+	public static function getProfileUrl(array $data) {
+		$url = self::PROFILE_BASE;
+		if(isset($data['username']) && !empty($data['username'])) {
+			$url.=$data['username'];
+		}
+		return $url;
+	}
+
 	public function me() {
 		if(!$this->isAuthentificated()) {
 			return false;
