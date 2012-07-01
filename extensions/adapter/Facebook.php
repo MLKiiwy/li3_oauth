@@ -153,6 +153,13 @@ class Facebook extends Consumer {
 		return false;
 	}
 
+	public function desauthorize() {
+		if(!$this->isAuthentificated()) {
+			return false;
+		}
+		return $this->delete('/me/permissions');
+	}
+
 	// -> Copy from sdk facebook
 	// TODO : Check if lithium can do it itself ?
 

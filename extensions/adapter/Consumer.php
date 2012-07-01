@@ -351,6 +351,11 @@ abstract class Consumer extends \lithium\core\Object {
 		return array();
 	}
 
+	public function desauthorize() {
+		// TODO implements in adapters
+		return true;
+	}
+
 	// DATA SECTION
 
 	abstract function checkTokenValidity($uid = null);
