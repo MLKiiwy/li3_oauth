@@ -6,12 +6,12 @@ use Exception;
 
 class Twitter extends Consumer {
 
-	const PROFILE_BASE = 'https://twitter.com/#!/';
+	const PROFILE_BASE = 'https://twitter.com/account/redirect_by_id?id=';
 
 	public static function getProfileUrl(array $data) {
 		$url = self::PROFILE_BASE;
-		if(isset($data['username']) && !empty($data['username'])) {
-			$url.=$data['username'];
+		if(isset($data['uid']) && !empty($data['uid'])) {
+			$url.=$data['uid'];
 		}
 		return $url;
 	}
