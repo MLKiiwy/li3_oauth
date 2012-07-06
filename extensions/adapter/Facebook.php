@@ -172,26 +172,30 @@ class Facebook extends Consumer {
 		return $ret;
 	}
 
+	protected static function _base64UrlDecode($input) {
+		return base64_decode(strtr($input, '-_', '+/'));
+	}
+
 	protected function _getSignedRequest() {
 		global $_REQUEST, $_COOKIE;
 		$signedRequest = array();
 		$cookieName = 'fbsr_' . $this->_config['client_id'];
-		if (isset($_REQUEST['signed_request'])) {
+		if (!empty($_REQUEST['signed_request'])) {
 			$signedRequest = $this->_parseSignedRequest($_REQUEST['signed_request']);
-		} else if (isset($_COOKIE[$cookieName])) {
+		} else if (!empty($_COOKIE[$cookieName])) {
 			$signedRequest = $this->_parseSignedRequest($_COOKIE[$cookieName]);
 		}
-		return $this->signedRequest;
+		return $signedRequest;
 	}
 
 	protected function _parseSignedRequest($signed_request) {
 		list($encoded_sig, $payload) = explode('.', $signed_request, 2);
 
 		// decode the data
-		$sig = self::base64UrlDecode($encoded_sig);
-		$data = json_decode(self::base64UrlDecode($payload), true);
+		$sig = self::_base64UrlDecode($encoded_sig);
+		$data = json_decode(self::_base64UrlDecode($payload), true);
 
-		if (strtoupper($data['algorithm']) !== 'HMAC-SHA256') {
+		if (empty($data['algorithm']) || strtoupper($data['algorithm']) !== 'HMAC-SHA256') {
 			throw new Exception('Unknown algorithm. Expected HMAC-SHA256');
 		}
 
@@ -203,6 +207,8 @@ class Facebook extends Consumer {
 
 		return $data;
 	}
+
+
 
 	// TODO Remove
 
