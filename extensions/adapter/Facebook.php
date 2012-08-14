@@ -29,11 +29,11 @@ class Facebook extends Consumer {
 			return false;
 		}
 		$data['uid'] = $me['id'];
-		$data['username'] = $me['name'];
-		$data['first_name'] = $me['first_name'];
-		$data['last_name'] = $me['last_name'];
+		$data['username'] = !empty($me['name']) ? $me['name'] : '';
+		$data['first_name'] = !empty($me['first_name']) ? $me['first_name'] : '';
+		$data['last_name'] = !empty($me['last_name']) ? $me['last_name'] : '';
 		$data['picture'] = Facebook::GRAPH_URL . $me['id'] . '/picture';
-		$data['email'] = $me['email'];
+		$data['email'] = !empty($me['email']) ? $me['email'] : '';
 		if(isset($me['gender']) && !empty($me['gender'])) {
 			$data['gender'] = $me['gender'];
 		}
