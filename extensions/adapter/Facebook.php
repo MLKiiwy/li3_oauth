@@ -12,6 +12,10 @@ class Facebook extends Consumer {
 
 	protected $_userId;
 
+	public static function getAvatarUrl($uid) {
+		return Facebook::GRAPH_URL . $uid . '/picture';
+	}
+
 	public static function getProfileUrl(array $data) {
 		$url = self::PROFILE_BASE;
 		if(isset($data['uid']) && !empty($data['uid'])) {
@@ -32,7 +36,7 @@ class Facebook extends Consumer {
 		$data['username'] = !empty($me['name']) ? $me['name'] : '';
 		$data['first_name'] = !empty($me['first_name']) ? $me['first_name'] : '';
 		$data['last_name'] = !empty($me['last_name']) ? $me['last_name'] : '';
-		$data['picture'] = Facebook::GRAPH_URL . $me['id'] . '/picture';
+		$data['picture'] = self::getAvatarUrl($me['id']);
 		$data['email'] = !empty($me['email']) ? $me['email'] : '';
 		if(isset($me['gender']) && !empty($me['gender'])) {
 			$data['gender'] = $me['gender'];
