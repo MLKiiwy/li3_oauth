@@ -164,6 +164,14 @@ class Facebook extends Consumer {
 		return $this->delete('/me/permissions');
 	}
 
+	public function permissions() {
+		if(!$this->isAuthentificated()) {
+			return array();
+		}
+		$permissions = $this->get('/me/permissions');
+		return (!empty($permissions['data'][0])) ? $permissions['data'][0] : array();
+	}
+
 	// -> Copy from sdk facebook
 	// TODO : Check if lithium can do it itself ?
 

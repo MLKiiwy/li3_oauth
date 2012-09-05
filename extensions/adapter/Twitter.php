@@ -119,6 +119,10 @@ class Twitter extends Consumer {
 		return true;
 	}
 
+	public function permissions() {
+		return array();
+	}
+
 }
 
 ?>
