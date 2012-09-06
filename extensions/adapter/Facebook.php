@@ -125,6 +125,10 @@ class Facebook extends Consumer {
 		return $this->post('/me/' . $action, $params);
 	}
 
+	public function removeOpenGraph($idAction) {
+		return $this->delete($idAction);
+	}
+
 	public function checkTokenValidity($uid = null) {
 		if(!$this->isAuthentificated()) {
 			return false;
