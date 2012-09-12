@@ -72,15 +72,29 @@ class Twitter extends Consumer {
 	}
 
 	protected function _formatUser($user) {
-		$data = array(
-			'uid' => $user->id,
-			'username' => $user->name,
-			'first_name' => null,
-			'last_name' => null,
-			'birthday' => null,
-			'gender' => null,
-			'picture' => $user->profile_image_url
-		);
+		if(is_object($user)) {
+			$data = array(
+				'uid' => $user->id,
+				'username' => $user->name,
+				'first_name' => null,
+				'last_name' => null,
+				'birthday' => null,
+				'gender' => null,
+				'picture' => $user->profile_image_url
+			);
+		} else if(is_array($user)) {
+			$data = array(
+				'uid' => $user['id'],
+				'username' => $user['name'],
+				'first_name' => null,
+				'last_name' => null,
+				'birthday' => null,
+				'gender' => null,
+				'picture' => $user['profile_image_url']
+			);
+		} else {
+			$data = array();
+		}
 		return $data;
 	}
 
