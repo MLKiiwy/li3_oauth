@@ -82,15 +82,15 @@ class Twitter extends Consumer {
 				'gender' => null,
 				'picture' => $user->profile_image_url
 			);
-		} else if(is_array($user)) {
+		} else if(is_array($user) && !empty($user)) {
 			$data = array(
-				'uid' => $user['id'],
-				'username' => $user['name'],
+				'uid' => !empty($user['id']) ? $user['id'] : null,
+				'username' => !empty($user['name']) ? $user['name'] : null,
 				'first_name' => null,
 				'last_name' => null,
 				'birthday' => null,
 				'gender' => null,
-				'picture' => $user['profile_image_url']
+				'picture' => !empty($user['profile_image_url']) ? $user['profile_image_url'] : null
 			);
 		} else {
 			$data = array();
