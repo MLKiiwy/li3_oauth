@@ -89,6 +89,22 @@ class OAuthProvider extends \lithium\core\Adaptable {
 					);
 					$required = array('credentials');
 				break;
+
+				default:
+					$defaults = array(
+						'adapter' => 'Basic',
+						'service' => 'oauth',
+						'credentials' => array(
+							'development' => array(),
+							'production' => array(),
+						),
+						'scope' => '',
+						'scheme' => 'http',
+						'port' => '80',
+					);
+
+					$required = array('credentials', 'host');
+				break;
 			}
 			$configurations[$service] += $defaults;
 			$configurations[$service]['name'] = $service;	// Setting name
