@@ -97,6 +97,15 @@ abstract class Consumer extends \lithium\core\Object {
 	public function __call($method, $params) {
 		switch($this->_config['service']) {
 			case 'oauth':
+				if(in_array($method, array('get', 'post', 'put', 'delete')) && $this->isAuthentificated()) {
+					$token = $this->token();
+					for($i=0; $i<3; $i++) {
+						if(!isset($params[$i])) {
+							$params[$i] = array();
+						}
+					}
+					$params[2] += array('token' => $token);
+				}
 				$data =  $this->_service->invokeMethod($method, $params);
 			break;
 
@@ -161,7 +170,7 @@ abstract class Consumer extends \lithium\core\Object {
 
 				// Ask for a request token
 				$token = $this->_requestToken('request', array('params' => array('oauth_callback' => $options['callback'])));
-				
+
 				// Check the token
 				if(!$token || is_string($token)) {
 					// TODO !
@@ -169,7 +178,7 @@ abstract class Consumer extends \lithium\core\Object {
 				}
 
 				// Save token
-				$this->_sessionWrite(self::SESSION_STATE_KEY, $token['oauth_token']);
+				$this->_sessionWrite(self::SESSION_STATE_KEY, $token);
 
 				// Ok save the token 
 				return $this->_service->url('authenticate', array('token' => $token));
@@ -231,11 +240,14 @@ abstract class Consumer extends \lithium\core\Object {
 				$this->_checkRequired($options['request']->query, array('oauth_token', 'oauth_verifier'));
 
 				// Check state
-				if(!$this->_checkState($options['request']->query['oauth_token'])) {
+				if(!$this->_checkState($options['request']->query)) {
 					throw new Exception('state doesn\'t match');
 				}
 
-				$data = $this->_requestToken('access', array('token' => $options['request']->query));
+				$token = $this->_sessionRead(self::SESSION_STATE_KEY);
+				$token += $options['request']->query;
+
+				$data = $this->_requestToken('access', array('token' => $token));
 
 				$this->token($data);
 
@@ -309,7 +321,11 @@ abstract class Consumer extends \lithium\core\Object {
 
 	protected function _checkState($state) {
 		$value = $this->_sessionRead(self::SESSION_STATE_KEY);
-		return $value == $state;
+		if(is_array($value)) {
+			return is_array($state) && !empty($state['oauth_token']) && !empty($value['oauth_token']) && $state['oauth_token'] == $value['oauth_token'];
+		} else {
+			return $value == $state;
+		}
 	}
 
 	protected function _clearState() {
