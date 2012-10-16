@@ -104,7 +104,8 @@ class Twitter extends Consumer {
 		$users = array();
 		if(!empty($data)) {
 			foreach($data as $user) {
-				$users[$user->id] = $this->_formatUser($user);
+				$id = is_object($user) ? $user->id : $user['id'];
+				$users[$id] = $this->_formatUser($user);
 			}
 		}
 		return $users;
