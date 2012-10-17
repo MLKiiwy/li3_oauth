@@ -121,6 +121,19 @@ class Twitter extends Consumer {
 	public function basicInfos() {
 		$me = $this->me();
 		$token = $this->token();
+		if(is_array($me)) {
+			$me['uid'] = empty($me['uid']) ? null : $me['uid'];
+			$me['username'] = empty($me['username']) ? null : $me['username'];
+			$me['picture'] = empty($me['picture']) ? null : $me['picture'];
+		} else if(is_object($me)) {
+			$cp = $me;
+			$me = array();
+			$me['uid'] = empty($cp->uid) ? null : $cp->uid;
+			$me['username'] = empty($cp->username) ? null : $cp->username;
+			$me['picture'] = empty($cp->picture) ? null : $cp->picture;
+		} else {
+			$me = array('uid' => null, 'picture' => null, 'username' => null);
+		}
 		$data = array(
 			'uid' => $me['uid'],
 			'access_token' => ($token) ? $token['oauth_token'] : '', 
