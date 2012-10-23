@@ -247,7 +247,11 @@ abstract class Consumer extends \lithium\core\Object {
 				$token = $this->_sessionRead(self::SESSION_STATE_KEY);
 				$token += $options['request']->query;
 
-				$data = $this->_requestToken('access', array('token' => $token));
+				try {
+					$data = $this->_requestToken('access', array('token' => $token));
+				} catch(Exception $e) {
+					throw new Exception('cannot get access token : ' . $e->getMessage());
+				}
 
 				$this->token($data);
 

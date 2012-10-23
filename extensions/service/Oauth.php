@@ -8,6 +8,7 @@
 
 namespace li3_oauth\extensions\service;
 
+use Exception;
 
 /**
  * Oauth service class for handling requests/response to consumers and from providers
@@ -104,11 +105,9 @@ class Oauth extends \lithium\net\http\Service {
 
 		$response = parent::send($method, $url, $data + $oauth, $options);
 
-		if (strpos($response, 'oauth_token=') !== false) {
+		if (strpos($response, 'oauth_token=') !== false || strpos($response, 'oauth_problem=') !== false ) {
 			$response = $this->_decode($response);
-		}
-
-		if (strpos($path, '.json') !== false) {
+		} else if (strpos($path, '.json') !== false) {
 			$response = json_decode($response);
 		}
 		return $response;
@@ -246,7 +245,11 @@ class Oauth extends \lithium\net\http\Service {
 	public function token($type, array $options = array()) {
 		$defaults = array('method' => 'POST', 'oauth_signature_method' => 'HMAC-SHA1');
 		$options += $defaults;
-		return $this->send($options['method'], $type, array(), $options);
+		$resp = $this->send($options['method'], $type, array(), $options);
+		if(!empty($resp['oauth_problem'])) {
+			throw new Exception($resp['oauth_problem']);
+		}
+		return $resp;
 	}
 
 	/**
