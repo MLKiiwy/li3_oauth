@@ -100,6 +100,7 @@ class Oauth extends \lithium\net\http\Service {
 				unset($oauth[$key]);
 			}
 			$options['headers'] = array('Authorization' => $header);
+			$options['headers']['Content-Length'] = 0;
 		}
 		$options['host'] = $options['proxy'] ? $options['proxy'] : $options['host'];
 
