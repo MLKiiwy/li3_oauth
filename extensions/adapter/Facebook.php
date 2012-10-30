@@ -10,6 +10,10 @@ class Facebook extends Consumer {
 	const WWW_URL = 'https://www.facebook.com/';
 	const PROFILE_BASE = 'http://www.facebook.com';
 
+	const LIKE_STATUS_LIKE = 2;
+	const LIKE_STATUS_NOT_LIKED = 1;
+	const LIKE_STATUS_UNKNOW = 0;
+
 	protected $_userId;
 
 	public static function getAvatarUrl($uid) {
@@ -224,7 +228,32 @@ class Facebook extends Consumer {
 		return $data;
 	}
 
+	public function isLiked($pageId) {
+		if(!$this->isAuthentificated()) {
+			return self::LIKE_STATUS_UNKNOW;
+		}
+		$token = $this->token();
+		$url = "https://api.facebook.com/method/pages.isFan?format=json&access_token=" . $token['access_token'];
+		$url.="&page_id=" . $pageId;
 
+		try {
+			$content = @file_get_contents($url);
+			if(!empty($content)) {
+				$data = json_decode($content, true);
+				if($data === true ) {
+					return self::LIKE_STATUS_LIKE;
+				} else if(!empty($data) && !empty($data['error_code'])) {
+					self::LIKE_STATUS_UNKNOW;
+				} else {
+					return self::LIKE_STATUS_NOT_LIKED;
+				}
+			}
+		} catch(Exception $e) {
+			// Ignore 
+		}
+
+		return self::LIKE_STATUS_UNKNOW;
+	}
 
 	// TODO Remove
 
