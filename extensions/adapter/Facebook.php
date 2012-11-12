@@ -33,7 +33,7 @@ class Facebook extends Consumer {
 			return false;
 		}
 		$me = $this->get('/me');
-		if(empty($me)) {
+		if(empty($me) || empty($me['id'])) {
 			return false;
 		}
 		$data['uid'] = $me['id'];
@@ -138,7 +138,7 @@ class Facebook extends Consumer {
 			return false;
 		}
 		$me = $this->get('/me');
-		if(empty($me)) {
+		if(empty($me) || empty($me['id'])) {
 			// Destroy session 
 			$this->clean();
 			return false;
