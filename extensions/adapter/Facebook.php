@@ -139,7 +139,7 @@ class Facebook extends Consumer {
 		}
 		$me = $this->get('/me');
 		if(empty($me) || empty($me['id'])) {
-			// Destroy session 
+			// Destroy session
 			$this->clean();
 			return false;
 		}
@@ -242,14 +242,12 @@ class Facebook extends Consumer {
 				$data = json_decode($content, true);
 				if($data === true ) {
 					return self::LIKE_STATUS_LIKE;
-				} else if(!empty($data) && !empty($data['error_code'])) {
-					self::LIKE_STATUS_UNKNOW;
-				} else {
+				} else if($data === false) {
 					return self::LIKE_STATUS_NOT_LIKED;
 				}
 			}
 		} catch(Exception $e) {
-			// Ignore 
+			// Ignore
 		}
 
 		return self::LIKE_STATUS_UNKNOW;
