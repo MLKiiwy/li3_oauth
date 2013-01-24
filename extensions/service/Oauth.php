@@ -106,9 +106,9 @@ class Oauth extends \lithium\net\http\Service {
 
 		$response = parent::send($method, $url, $data + $oauth, $options);
 
-		if (strpos($response, 'oauth_token=') !== false || strpos($response, 'oauth_problem=') !== false ) {
+		if (is_string($response) &&  ( strpos($response, 'oauth_token=') !== false || strpos($response, 'oauth_problem=') !== false ) ) {
 			$response = $this->_decode($response);
-		} else if (strpos($path, '.json') !== false) {
+		} else if (is_string($response) && strpos($path, '.json') !== false) {
 			$response = json_decode($response);
 		}
 		return $response;
@@ -121,7 +121,7 @@ class Oauth extends \lithium\net\http\Service {
 	 * @param array $options
 	 *              - `token`: (array) adds the oauth_token to the query params
 	 *              - `usePort`: (boolean) use the port in the signature base string
-	 * @return stringthe full url 
+	 * @return stringthe full url
 	 */
 	public function url($url = null, array $options = array()) {
 		$defaults = array('token' => array('oauth_token' => false), 'usePort' => false);
@@ -188,7 +188,7 @@ class Oauth extends \lithium\net\http\Service {
 			rawurlencode($options['oauth_consumer_secret']),
 			rawurlencode(isset($options['token']['oauth_token_secret']) ? $options['token']['oauth_token_secret'] : "")
 		));
-		
+
 		switch ($options['oauth_signature_method']) {
 			case 'HMAC-SHA1':
 				$signature = base64_encode(hash_hmac('sha1', $base, $key, true));
