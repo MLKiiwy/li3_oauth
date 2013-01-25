@@ -44,16 +44,16 @@ class Twitter extends Consumer {
 		}
 		$data = $this->get('1/friends/ids.json', array('user_id' => $options['userId']));
 		$friends = array();
-		foreach($data->ids as $uid) {
+		foreach($data['ids'] as $uid) {
 			$friends[$uid] = array('uid' => $uid);
 		}
 		if($options['full']) {
 			$blocs = array();
 			$uids = array();
 			$i = 0;
-			foreach($data->ids as $uid) {
+			foreach($data['ids'] as $uid) {
 				$uids[] = $uid;
-				if($i == 100) {
+				if($i == 80) {
 					$blocs[] = $uids;
 					$uids = array();
 					$i = 0;
@@ -136,12 +136,12 @@ class Twitter extends Consumer {
 		}
 		$data = array(
 			'uid' => $me['uid'],
-			'access_token' => ($token) ? $token['oauth_token'] : '', 
-			'oauth_secret' => ($token) ? $token['oauth_token_secret'] : '', 
-			'username' => $me['username'], 
-			'first_name' => null, 
-			'last_name' => null, 
-			'picture' => $me['picture'], 
+			'access_token' => ($token) ? $token['oauth_token'] : '',
+			'oauth_secret' => ($token) ? $token['oauth_token_secret'] : '',
+			'username' => $me['username'],
+			'first_name' => null,
+			'last_name' => null,
+			'picture' => $me['picture'],
 		);
 		return $data;
 	}
