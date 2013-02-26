@@ -165,11 +165,15 @@ abstract class Consumer extends \lithium\core\Object {
 	public function authenticate(array $options = array()) {
 		switch($this->_config['service']) {
 			case 'oauth':
-				
-				$this->_checkRequired($options, array('callback'));
+
+				$params = array('params' => array());
+				if(!isset($this->_config['mode']) || $this->_config['mode'] != '2-legged') {
+					$this->_checkRequired($options, array('callback'));
+					$params = array('params' => array('oauth_callback' => $options['callback']));
+				}
 
 				// Ask for a request token
-				$token = $this->_requestToken('request', array('params' => array('oauth_callback' => $options['callback'])));
+				$token = $this->_requestToken('request', $params);
 
 				// Check the token
 				if(!$token || is_string($token)) {
@@ -180,8 +184,12 @@ abstract class Consumer extends \lithium\core\Object {
 				// Save token
 				$this->_sessionWrite(self::SESSION_STATE_KEY, $token);
 
-				// Ok save the token 
-				return $this->_service->url('authenticate', array('token' => $token));
+				// Ok save the token
+				if(!isset($this->_config['mode']) || $this->_config['mode'] != '2-legged') {
+					return $this->_service->url('authenticate', array('token' => $token));
+				} else {
+					return $token;
+				}
 			break;
 
 			case 'oauth2':
@@ -232,23 +240,31 @@ abstract class Consumer extends \lithium\core\Object {
 	 */
 	public function getAccessToken(array $options = array()) {
 
-		$this->_checkRequired($options, array('request','callback'));
+		$requiredParam = ($this->_config['mode'] == '2-legged') ? array() : array('request','callback');
+		$this->_checkRequired($options, $requiredParam);
 
 		switch($this->_config['service']) {
 			case 'oauth':
 				// Get data from query request
-				$this->_checkRequired($options['request']->query, array('oauth_token', 'oauth_verifier'));
+				if($this->_config['mode'] != '2-legged') {
+					$this->_checkRequired($options['request']->query, array('oauth_token', 'oauth_verifier'));
 
-				// Check state
-				if(!$this->_checkState($options['request']->query)) {
-					throw new Exception('state doesn\'t match');
+					// Check state
+					if(!$this->_checkState($options['request']->query)) {
+						throw new Exception('state doesn\'t match');
+					}
+
+					$token = $this->_sessionRead(self::SESSION_STATE_KEY);
+					$token += $options['request']->query;
+
+					$params = array('token' => $token);
+				} else {
+					$params = array();
 				}
 
-				$token = $this->_sessionRead(self::SESSION_STATE_KEY);
-				$token += $options['request']->query;
-
 				try {
-					$data = $this->_requestToken('access', array('token' => $token));
+					$data = $this->_requestToken('access', $params);
+					var_dump($data);
 				} catch(Exception $e) {
 					throw new Exception('cannot get access token : ' . $e->getMessage());
 				}
@@ -274,7 +290,7 @@ abstract class Consumer extends \lithium\core\Object {
 				} catch (Exception $e) {
 					throw new Exception('cannot get access token');
 				}
-				
+
 				if(isset($data['error'])) {
 					// Error
 					$message = (is_string($data['error'])) ? $data['error'] : $data['error']['type']." : ".$data['error']['message'];
