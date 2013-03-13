@@ -109,7 +109,7 @@ class Oauth extends \lithium\net\http\Service {
 		if (is_string($response) &&  ( strpos($response, 'oauth_token=') !== false || strpos($response, 'oauth_problem=') !== false ) ) {
 			$response = $this->_decode($response);
 		} else if (is_string($response) && strpos($path, '.json') !== false) {
-			$response = json_decode($response);
+			$response = json_decode($response, true);
 		}
 		return $response;
 	}
