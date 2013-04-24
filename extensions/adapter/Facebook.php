@@ -73,6 +73,9 @@ class Facebook extends Consumer {
 			return false;
 		}
 		$data = $this->get($options['userId'] . '/friends');
+		if(empty($data['data'])) {
+			return array();
+		}
 		$friends = array();
 		foreach($data['data'] as $friend) {
 			$friends[$friend['id']] = array('username' => $friend['name'], 'uid' => $friend['id']);

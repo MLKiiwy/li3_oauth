@@ -43,6 +43,9 @@ class Twitter extends Consumer {
 			return false;
 		}
 		$data = $this->get('1/friends/ids.json', array('user_id' => $options['userId']));
+		if(empty($data['ids'])) {
+			return array();
+		}
 		$friends = array();
 		foreach($data['ids'] as $uid) {
 			$friends[$uid] = array('uid' => $uid);
