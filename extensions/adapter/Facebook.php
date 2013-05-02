@@ -14,8 +14,6 @@ class Facebook extends Consumer {
 	const LIKE_STATUS_NOT_LIKED = 1;
 	const LIKE_STATUS_UNKNOW = 0;
 
-	protected $_userId;
-
 	public static function getAvatarUrl($uid) {
 		return Facebook::GRAPH_URL . $uid . '/picture';
 	}
@@ -56,11 +54,13 @@ class Facebook extends Consumer {
 		if(!$this->isAuthentificated()) {
 			return false;
 		}
-		if(empty($this->_userId)) {
+		$token = $this->token();
+		if(empty($token['uid'])) {
 			$me = $this->me();
-			$this->_userId = $me['uid'];
+			$token['uid'] = $me['uid'];
+			$this->token($token);
 		}
-		return $this->_userId;
+		return $token['uid'];
 	}
 
 	public function friends(array $options = array()) {
