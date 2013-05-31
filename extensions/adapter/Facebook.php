@@ -45,7 +45,9 @@ class Facebook extends Consumer {
 		}
 		if(isset($me['birthday']) && !empty($me['birthday'])) {
 			$d = explode('/', $me['birthday']);
-			$data['birthday'] = $d[2] . '-' . $d[0] . '-' . $d[1];
+			if (!empty($d[2])) {
+				$data['birthday'] = $d[2] . '-' . $d[0] . '-' . $d[1];
+			}
 		}
 		return $data;
 	}
