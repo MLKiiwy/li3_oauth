@@ -42,7 +42,7 @@ class Twitter extends Consumer {
 		if(!$this->isAuthentificated()) {
 			return false;
 		}
-		$data = $this->get('1/friends/ids.json', array('user_id' => $options['userId']));
+		$data = $this->get('1.1/friends/ids.json', array('user_id' => $options['userId']));
 		if(empty($data['ids'])) {
 			return array();
 		}
@@ -103,7 +103,7 @@ class Twitter extends Consumer {
 
 	public function getUsers($users) {
 		$users = !(is_array($users)) ? array($users) : $users;
-		$data = $this->get('1/users/lookup.json', array('user_id' => implode(',', $users)));
+		$data = $this->get('1.1/users/lookup.json', array('user_id' => implode(',', $users)));
 		$users = array();
 		if(!empty($data)) {
 			foreach($data as $user) {
