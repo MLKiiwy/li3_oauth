@@ -14,8 +14,12 @@ class Facebook extends Consumer {
 	const LIKE_STATUS_NOT_LIKED = 1;
 	const LIKE_STATUS_UNKNOW = 0;
 
-	public static function getAvatarUrl($uid) {
-		return Facebook::GRAPH_URL . $uid . '/picture';
+	public static function getAvatarUrl($uid, $width = false) {
+		$url = Facebook::GRAPH_URL . $uid . '/picture';
+		if (!empty($width)) {
+			$url .= '?width=' . $width . '&height=' . $width;
+		}
+		return $url;
 	}
 
 	public static function getProfileUrl(array $data) {
