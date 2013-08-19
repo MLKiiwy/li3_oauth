@@ -17,7 +17,7 @@ class Facebook extends Consumer {
 	public static function getAvatarUrl($uid, $width = false) {
 		$url = Facebook::GRAPH_URL . $uid . '/picture';
 		if (!empty($width)) {
-			$url .= '?width=' . $width . '&height=' . $width;
+			$url .= '?width=' . $width . '&amp;height=' . $width;
 		}
 		return $url;
 	}
