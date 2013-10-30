@@ -23,11 +23,10 @@ class Facebook extends Consumer {
 	}
 
 	public static function getProfileUrl(array $data) {
-		$url = self::PROFILE_BASE;
 		if(isset($data['uid']) && !empty($data['uid'])) {
-			$url.="/profile.php?id=".$data['uid'];
+			return self::PROFILE_BASE . "/profile.php?id=".$data['uid'];
 		}
-		return $url;
+		return '';
 	}
 
 	public function me() {
