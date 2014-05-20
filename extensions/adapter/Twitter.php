@@ -8,9 +8,9 @@ class Twitter extends Consumer {
 
 	const PROFILE_BASE = 'https://twitter.com/account/redirect_by_id?id=';
 
-	public static function getProfileUrl(array $data) {
-		if(isset($data['uid']) && !empty($data['uid'])) {
-			return self::PROFILE_BASE . $data['uid'];
+	public static function getProfileUrl($data) {
+		if(isset($data->uid) && !empty($data->uid)) {
+			return self::PROFILE_BASE . $data->uid;
 		}
 		return '';
 	}

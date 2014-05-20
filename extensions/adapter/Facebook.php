@@ -14,7 +14,7 @@ class Facebook extends Consumer {
 	const LIKE_STATUS_NOT_LIKED = 1;
 	const LIKE_STATUS_UNKNOW = 0;
 
-	public static function getAvatarUrl($uid, $width = false) {
+	public static function getAvatarUrl($uid, $width = 400) {
 		$url = Facebook::GRAPH_URL . $uid . '/picture';
 		if (!empty($width)) {
 			$url .= '?width=' . $width . '&amp;height=' . $width;
@@ -22,9 +22,9 @@ class Facebook extends Consumer {
 		return $url;
 	}
 
-	public static function getProfileUrl(array $data) {
-		if(isset($data['uid']) && !empty($data['uid'])) {
-			return self::PROFILE_BASE . "/profile.php?id=".$data['uid'];
+	public static function getProfileUrl($data) {
+		if(isset($data->uid) && !empty($data->uid)) {
+			return self::PROFILE_BASE . "/profile.php?id=" . $data->uid;
 		}
 		return '';
 	}
