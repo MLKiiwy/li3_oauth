@@ -37,7 +37,7 @@ class OAuthApiController extends AppBaseController {
 
 	protected function _getRedirectUri() {
 		$host = Environment::get('host');
-		return Router::match(array('controller' => 'oAuthApi', 'action' => 'callback', 'name' => $this->_currentApi), null, array('absolute' => true, 'host' => $host));
+		return Router::match(array('controller' => 'oAuthApi', 'action' => 'callback2', 'name' => $this->_currentApi), null, array('absolute' => true, 'host' => $host));
 	}
 
 	public function index() {
