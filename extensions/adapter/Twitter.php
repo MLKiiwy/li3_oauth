@@ -6,7 +6,7 @@ use Exception;
 
 class Twitter extends Consumer {
 
-	const PROFILE_BASE = 'https://twitter.com/account/redirect_by_id?id=';
+	const PROFILE_BASE = 'https://twitter.com/intent/user?user_id=';
 
 	public static function getProfileUrl($data) {
 		if(isset($data['uid']) && !empty($data['uid'])) {
