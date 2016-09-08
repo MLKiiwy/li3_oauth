@@ -1,5 +1,6 @@
 {
   "name": "senscritique/li3_oauth",
+  "type": "lithium-library",
   "homepage": "http://www.senscritique.com",
   "version": "1.0.0",
   "authors": [],
@@ -9,10 +10,5 @@
   },
   "require-dev": {
     "unionofrad/lithium": "1.1.*"
-  },
-  "autoload": {
-    "psr-0": {
-      "lithium": "libraries"
-    }
   }
-}
+}  
