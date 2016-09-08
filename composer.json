@@ -1,0 +1,18 @@
+{
+  "name": "senscritique/li3_oauth",
+  "homepage": "http://www.senscritique.com",
+  "version": "1.0.0",
+  "authors": [],
+  "minimum-stability": "dev",
+  "require": {
+    "composer/installers": "dev-master"
+  },
+  "require-dev": {
+    "unionofrad/lithium": "1.1.*"
+  },
+  "autoload": {
+    "psr-0": {
+      "lithium": "libraries"
+    }
+  }
+}
