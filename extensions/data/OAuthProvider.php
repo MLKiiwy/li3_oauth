@@ -32,7 +32,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 			switch ($service) {
 				case self::SERVICE_NAME_FACEBOOK:
 					$defaults = array(
-						'adapter' => 'Facebook',
+						'adapter' => 'li3_oauth\\extensions\\adapter\\Facebook',
 						'service' => 'oauth2',
 						'credentials' => array(
 							'development' => array(),
@@ -50,7 +50,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 
 				case self::SERVICE_NAME_GMAIL:
 					$defaults = array(
-						'adapter' => 'Gmail',
+						'adapter' => 'li3_oauth\\extensions\\adapter\\Gmail',
 						'service' => 'oauth2',
 						'credentials' => array(
 							'development' => array(),
@@ -76,7 +76,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 
 				case self::SERVICE_NAME_TWITTER:
 					$defaults = array(
-						'adapter' => 'Twitter',
+						'adapter' => 'li3_oauth\\extensions\\adapter\\Twitter',
 						'service' => 'oauth',
 						'credentials' => array(
 							'development' => array(),
@@ -92,7 +92,7 @@ class OAuthProvider extends \lithium\core\Adaptable {
 
 				default:
 					$defaults = array(
-						'adapter' => 'Basic',
+						'adapter' => 'li3_oauth\\extensions\\adapter\\Basic',
 						'service' => 'oauth',
 						'credentials' => array(
 							'development' => array(),

@@ -9,6 +9,11 @@
     "composer/installers": "dev-master"
   },
   "require-dev": {
-    "unionofrad/lithium": "1.1.*"
+    "unionofrad/lithium": "v1.1.*"
+  },
+  "autoload": {
+    "psr-0": {
+      "li3_oauth": "libraries"
+    }
   }
 }  
